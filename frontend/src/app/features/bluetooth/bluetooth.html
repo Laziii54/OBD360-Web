@@ -1,0 +1,132 @@
+<div class="bluetooth-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-breadcrumb">CONNECTION / BLUETOOTH</div>
+      <h1>Bluetooth Adapter</h1>
+      <p>Connect your OBD2 adapter to start vehicle diagnostics.</p>
+    </div>
+
+    <div class="connection-badge" [class.is-connected]="adapter.isConnected()">
+      <span class="status-dot"></span>
+      {{ statusLabel() }}
+    </div>
+  </div>
+
+  <!-- CONNECTION OVERVIEW -->
+  <div class="connection-overview">
+
+    <div class="overview-icon">◉</div>
+
+    <div class="overview-content">
+      <span class="overview-label">ADAPTER CONNECTION</span>
+      <h2>{{ adapter.adapterName() ?? 'No adapter connected' }}</h2>
+      <p>
+        Connect an OBD2 Bluetooth adapter to communicate
+        with your vehicle's ECU.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="bluetooth-grid">
+
+    <!-- DEVICE DISCOVERY -->
+    <section class="content-card device-card">
+
+      <div class="card-header">
+        <div>
+          <span class="section-label">DEVICE MANAGEMENT</span>
+          <h2>Available Adapters</h2>
+        </div>
+
+        <span class="device-count">{{ adapter.adapterName() ? 1 : 0 }} DEVICES</span>
+      </div>
+
+      <div class="search-area">
+
+        <div class="search-icon">⌕</div>
+
+        <div class="search-text">
+          <h3>Search for OBD2 adapters</h3>
+          <p>
+            Make sure your adapter is powered on and
+            Bluetooth is enabled.
+          </p>
+        </div>
+
+      </div>
+
+      <button
+        class="search-button"
+        type="button"
+        [disabled]="adapter.isBusy() || !adapter.isSupported"
+        (click)="toggleConnection()"
+      >
+        <span>⌕</span>
+        {{ adapter.isConnected() ? 'Disconnect' : 'Search for Adapters' }}
+      </button>
+
+      @if (!adapter.isSupported) {
+        <p class="adapter-error">This browser does not support Web Bluetooth. Use Chrome or Edge.</p>
+      }
+
+      @if (adapter.errorMessage(); as error) {
+        <p class="adapter-error">{{ error }}</p>
+      }
+
+      @if (adapter.log().length) {
+        <pre class="adapter-log">{{ adapter.log().join('\n') }}</pre>
+      } @else {
+        <div class="empty-devices">
+          <div class="empty-icon">◉</div>
+          <h3>No devices found</h3>
+          <p>
+            Available Bluetooth adapters will appear here.
+          </p>
+        </div>
+      }
+
+    </section>
+
+    <!-- CONNECTION INFORMATION -->
+    <section class="content-card information-card">
+
+      <span class="section-label">CONNECTION DETAILS</span>
+      <h2>Connection Information</h2>
+
+      <div class="info-row">
+        <span>Connection Type</span>
+        <strong>Bluetooth BLE</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Adapter</span>
+        <strong>{{ adapter.elmVersion() ?? adapter.adapterName() ?? 'Not detected' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Protocol</span>
+        <strong>{{ adapter.protocol() ?? 'Not initialized' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Vehicle</span>
+        <strong>{{ adapter.vehicleResponding() ? 'Responding' : 'Not connected' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Battery</span>
+        <strong>{{ adapter.voltage() ?? '--' }}</strong>
+      </div>
+
+      <div class="info-footer">
+        Adapter information will appear after connection.
+      </div>
+
+    </section>
+
+  </div>
+</div>

@@ -1,0 +1,134 @@
+<div class="ai-page">
+
+  <header class="ai-header">
+    <div>
+      <span class="page-label">ASSISTANT / SCAN REPORT</span>
+      <h1>AI Assistant</h1>
+      <p>ბოლო სკანირების შედეგი, ახსნა და კითხვები n8n workflow-ის მეშვეობით.</p>
+    </div>
+
+    <div class="ai-header-actions">
+      <span
+        class="ai-status"
+        [class.is-online]="integrationState() === 'online'"
+        [class.is-offline]="integrationState() === 'offline'"
+      >
+        <span class="ai-status-dot"></span>
+        {{ integrationLabel() }}
+      </span>
+
+      <button type="button" [disabled]="loading()" (click)="load()">
+        {{ loading() ? 'მზადდება...' : 'განახლება' }}
+      </button>
+    </div>
+  </header>
+
+  @if (integration(); as n8n) {
+    @if (!n8n.configured) {
+      <p class="ai-hint">
+        n8n ჯერ არ არის დაკავშირებული. მიუთითე <code>N8n:BaseUrl</code> ბექენდის
+        appsettings-ში ან user secrets-ში და გაუშვი n8n. დეტალები: <code>n8n/README.md</code>.
+      </p>
+    } @else if (n8n.reachable === false) {
+      <p class="ai-hint is-warning">
+        n8n სერვერი არ პასუხობს. გაუშვი ინსტანსი და გაააქტიურე workflow-ები — დეტალები:
+        <code>n8n/README.md</code>.
+      </p>
+    }
+  }
+
+  @if (loading()) {
+    <p class="ai-message">AI ამზადებს სკანირების ანგარიშს...</p>
+  } @else if (noScan()) {
+    <p class="ai-message">ჯერ სკანირება არ არის. გააკეთე სკანირება DTC Scanner გვერდზე და დაბრუნდი აქ.</p>
+  } @else if (failed()) {
+    <p class="ai-message is-error">ანგარიში ვერ ჩაიტვირთა. შეამოწმე, გაშვებულია თუ არა ბექენდი.</p>
+  } @else if (report(); as data) {
+    <section class="ai-verdict" [class.has-problems]="data.hasProblems">
+      <strong>{{ data.hasProblems ? 'პრობლემა აღმოჩენილია' : 'პრობლემა არ აღმოჩენილა' }}</strong>
+      <span>{{ data.vehicle }} · {{ data.scannedAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+    </section>
+
+    @if (!data.hasProblems) {
+      <p class="ai-hint">
+        ეს დასკვნა ეფუძნება {{ data.scannedAt | date: 'dd.MM.yyyy HH:mm' }}-ის შენახულ სკანირებას,
+        სადაც DTC კოდები არ ფიქსირდება. თუ მანქანაზე კოდებია, გააკეთე ახალი სკანირება
+        DTC Scanner-ზე და დაბრუნდი აქ.
+      </p>
+    }
+
+    @if (data.explanation) {
+      <section class="ai-card">
+        <h2>AI-ის ახსნა</h2>
+        <p class="ai-text">{{ data.explanation }}</p>
+      </section>
+    } @else if (data.aiError) {
+      <p class="ai-message is-error">{{ data.aiError }}</p>
+    }
+
+    @if (data.codes.length) {
+      <section class="ai-card">
+        <h2>აღმოჩენილი კოდები</h2>
+        @for (item of data.codes; track item.code) {
+          <article class="ai-code">
+            <strong>{{ item.code }}</strong>
+            <div>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+            </div>
+          </article>
+        }
+      </section>
+    }
+  }
+
+  <section class="ai-card ai-chat">
+    <div class="ai-chat-header">
+      <div>
+        <h2>დასვი კითხვა</h2>
+        <p>კითხვა გადაეცემა n8n ასისტენტის workflow-ს და ინახება საუბრის ისტორიაში.</p>
+      </div>
+      @if (integration()?.askConfigured) {
+        <span class="ai-chat-badge">n8n ask</span>
+      }
+    </div>
+
+    @if (!messages().length) {
+      <p class="ai-message">ჰკითხე ასისტენტს სკანირების, კოდების ან შეკეთების შესახებ.</p>
+    }
+
+    <div class="ai-chat-log">
+      @for (message of messages(); track $index) {
+        <article class="ai-chat-message" [class.is-user]="message.role === 'user'">
+          <span class="ai-chat-role">{{ message.role === 'user' ? 'შენ' : 'AI' }}</span>
+          <p>{{ message.content }}</p>
+        </article>
+      }
+
+      @if (asking()) {
+        <p class="ai-message">AI ფიქრობს...</p>
+      }
+    </div>
+
+    @if (askError()) {
+      <p class="ai-message is-error">{{ askError() }}</p>
+    }
+
+    <form class="ai-chat-form" (submit)="$event.preventDefault(); ask()">
+      <input
+        type="text"
+        name="question"
+        autocomplete="off"
+        placeholder="მაგ. რამდენად სასწრაფოა ეს კოდი?"
+        [value]="draft()"
+        [disabled]="asking()"
+        (input)="updateDraft($any($event.target).value)"
+      >
+
+      <button type="submit" [disabled]="asking() || !draft().trim()">
+        {{ asking() ? 'იგზავნება...' : 'გაგზავნა' }}
+      </button>
+    </form>
+  </section>
+
+</div>

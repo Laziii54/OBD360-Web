@@ -1,0 +1,40 @@
+<div class="graphs-page">
+
+  <header class="graphs-header">
+    <div>
+      <span class="page-label">DIAGNOSTICS / GRAPHS</span>
+      <h1>Graphs</h1>
+      <p>Follow key vehicle parameters over the last 60 readings.</p>
+    </div>
+
+    <span class="graphs-status" [class.is-live]="live.streaming()">
+      {{ live.streaming() ? 'STREAMING' : 'WAITING FOR CONNECTION' }}
+    </span>
+  </header>
+
+  @if (!adapter.isConnected()) {
+    <p class="graphs-hint">Connect your adapter on the Bluetooth page to start the graphs.</p>
+  }
+
+  <div class="graphs-grid">
+    @for (graph of graphs(); track graph.id) {
+      <section class="graph-card">
+        <div class="graph-heading">
+          <span>{{ graph.name }}</span>
+          <strong>{{ graph.value }} <small>{{ graph.unit }}</small></strong>
+        </div>
+
+        <div class="graph-area">
+          @if (graph.points) {
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <polyline [attr.points]="graph.points" />
+            </svg>
+          } @else {
+            <p>{{ graph.unsupported ? 'Not supported by this vehicle' : 'Waiting for data' }}</p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+</div>

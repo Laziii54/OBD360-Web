@@ -1,0 +1,196 @@
+<div class="freeze-frame-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <span class="page-label">DIAGNOSTICS / FREEZE FRAME</span>
+      <h1>Freeze Frame</h1>
+      <p>
+        View vehicle operating conditions captured when a
+        diagnostic trouble code was detected.
+      </p>
+    </div>
+
+    <div class="frame-status">
+      <span class="status-dot"></span>
+      {{ statusLabel() }}
+    </div>
+  </div>
+
+
+  <!-- INFORMATION BANNER -->
+  <section class="info-banner">
+
+    <div class="info-icon">◈</div>
+
+    <div>
+      <h2>What is Freeze Frame Data?</h2>
+      <p>
+        Freeze Frame stores a snapshot of selected vehicle sensor
+        values when certain diagnostic faults are detected.
+        These values can help identify the conditions under
+        which a fault occurred.
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- FRAME CONTROLS -->
+  <section class="frame-controls">
+
+    <div class="control-vehicle">
+
+      <div class="vehicle-icon">🚘</div>
+
+      <div>
+        <span>SELECTED VEHICLE</span>
+        <strong>No vehicle selected</strong>
+      </div>
+
+    </div>
+
+    <div class="control-actions">
+
+      <button
+        class="read-button"
+        type="button"
+        [disabled]="!adapter.isConnected() || reading()"
+        (click)="read()"
+      >
+        ◈ {{ reading() ? 'Reading...' : 'Read Freeze Frame' }}
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- SELECTED FAULT -->
+  <section class="fault-card">
+
+    <div class="fault-left">
+
+      <div class="fault-icon">⚠</div>
+
+      <div>
+        <span class="section-label">SELECTED DIAGNOSTIC TROUBLE CODE</span>
+        <h2>{{ frameDtc() ?? '---' }}</h2>
+        <p>{{ frameTitle() ?? errorMessage() ?? 'No diagnostic trouble code selected.' }}</p>
+      </div>
+
+    </div>
+
+    <div class="fault-status">
+      <span class="fault-status-dot"></span>
+      {{ frameDtc() ? 'FRAME 00' : 'NO DATA' }}
+    </div>
+
+  </section>
+
+
+  <!-- SNAPSHOT INFORMATION -->
+  <section class="snapshot-section">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-label">RECORDED CONDITIONS</span>
+        <h2>Vehicle Snapshot</h2>
+      </div>
+
+      <span class="snapshot-badge">MODE 02</span>
+
+    </div>
+
+
+    <!-- SENSOR GRID -->
+    <div class="snapshot-grid">
+      @for (pid of pids; track pid.id) {
+        <div class="snapshot-card">
+
+          <div class="snapshot-top">
+            <span [class]="'snapshot-icon ' + pid.iconClass">{{ pid.icon }}</span>
+            <span class="snapshot-category">{{ pid.category }}</span>
+          </div>
+
+          <span class="snapshot-name">{{ pid.name }}</span>
+
+          <div class="snapshot-value">
+            {{ display(pid) }} <span>{{ unit(pid) }}</span>
+          </div>
+
+          <div class="snapshot-footer">
+            <span>PID {{ pid.pid.slice(2) }}</span>
+            <span>{{ display(pid) === '--' ? 'Unavailable' : 'Recorded' }}</span>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </section>
+
+
+  <!-- FRAME DETAILS -->
+  <section class="details-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">SNAPSHOT METADATA</span>
+        <h2>Frame Information</h2>
+      </div>
+    </div>
+
+
+    <div class="details-grid">
+
+      <div class="detail-item">
+        <span>Freeze Frame DTC</span>
+        <strong>{{ frameDtc() ?? '---' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Frame Number</span>
+        <strong>{{ frameDtc() ? '00' : '---' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Read At</span>
+        <strong>{{ readAt() ? (readAt() | date: 'dd.MM.yyyy HH:mm') : 'Not available' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Data Source</span>
+        <strong>OBD-II Mode 02</strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- EMPTY STATE -->
+  @if (!frameDtc()) {
+  <section class="empty-frame">
+
+    <div class="empty-frame-icon">◈</div>
+
+    <h3>No Freeze Frame Data Available</h3>
+
+    <p>
+      Connect your OBD2 adapter and read the stored diagnostic
+      trouble codes to retrieve available Freeze Frame data.
+    </p>
+
+  </section>
+  }
+
+
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <span>OBD360 DIAGNOSTIC PLATFORM</span>
+    <span>FREEZE FRAME DATA / MODE 02</span>
+  </div>
+
+</div>

@@ -1,0 +1,359 @@
+<div class="dtc-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <span class="page-label">VEHICLE DIAGNOSTICS / DTC SCANNER</span>
+      <h1>Diagnostic Scanner</h1>
+      <p>Scan your vehicle, identify faults and analyze diagnostic trouble codes.</p>
+    </div>
+
+    <div class="scanner-status">
+      <span class="status-dot"></span>
+      {{ adapter.isConnected() ? 'CONNECTED' : 'NOT CONNECTED' }}
+    </div>
+  </div>
+
+
+  <!-- VEHICLE CONNECTION -->
+  <section class="vehicle-card">
+
+    <div class="vehicle-main">
+
+      <div class="vehicle-icon">🚘</div>
+
+      <div class="vehicle-info">
+        <span class="section-label">CURRENT VEHICLE</span>
+        <h2>No vehicle selected</h2>
+        <p>Connect your OBD2 adapter to begin diagnostics.</p>
+      </div>
+
+    </div>
+
+    <div class="adapter-status">
+      <span class="adapter-indicator"></span>
+
+      <div>
+        <strong>{{ adapter.adapterName() ?? 'Adapter Disconnected' }}</strong>
+        <span>{{ adapter.protocol() ?? 'ELM327 / OBD-II' }}</span>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- SCAN CONTROL -->
+  <section class="scan-control-card">
+
+    <div class="scan-control-content">
+
+      <span class="section-label">DIAGNOSTIC CONTROL CENTER</span>
+
+      <h2>Vehicle Diagnostic Scan</h2>
+
+      <p>
+        Perform a diagnostic scan to retrieve stored,
+        pending and permanent trouble codes from your vehicle.
+      </p>
+
+      <div class="scan-capabilities">
+
+        <div>
+          <span>✓</span>
+          Stored DTC
+        </div>
+
+        <div>
+          <span>✓</span>
+          Pending DTC
+        </div>
+
+        <div>
+          <span>✓</span>
+          Permanent DTC
+        </div>
+
+        <div>
+          <span>✓</span>
+          Vehicle Information
+        </div>
+
+      </div>
+
+      <button class="start-scan-button" type="button" [disabled]="!canScan()" (click)="scanner.scan()">
+        <span class="scan-button-icon">⌕</span>
+        {{ scanner.scanning() ? 'Scanning...' : 'Start Full Diagnostic Scan' }}
+      </button>
+
+      @if (scanner.errorMessage(); as error) {
+        <span class="scan-error">{{ error }}</span>
+      } @else if (!adapter.isConnected()) {
+        <span class="scan-requirement">
+          Connect a compatible OBD2 adapter before starting the scan.
+        </span>
+      }
+
+    </div>
+
+    <div class="scan-illustration">
+      <div class="scan-circle">
+        <div class="scan-inner-circle">
+          <span>OBD</span>
+          <strong>360</strong>
+        </div>
+      </div>
+      <span class="scan-illustration-label">DIAGNOSTIC ENGINE</span>
+    </div>
+
+  </section>
+
+
+  <!-- SCAN SUMMARY -->
+  <section class="summary-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">DIAGNOSTIC RESULTS</span>
+        <h2>Scan Summary</h2>
+      </div>
+
+      <span class="summary-status">
+        @if (scanner.vehicleStatus(); as status) {
+          MIL {{ status.milOn ? 'ON' : 'OFF' }}
+        } @else {
+          {{ scanner.hasScanned() ? 'SCAN COMPLETE' : 'NO SCAN PERFORMED' }}
+        }
+      </span>
+    </div>
+
+
+    <div class="summary-grid">
+
+      <!-- STORED -->
+      <div class="summary-card">
+
+        <div class="summary-card-header">
+          <span class="summary-icon stored-icon">⚠</span>
+          <span class="summary-type">STORED DTC</span>
+        </div>
+
+        <div class="summary-value">{{ count('03') }}</div>
+
+        <p>Confirmed trouble codes</p>
+
+        <div class="summary-footer">
+          Mode 03
+        </div>
+
+      </div>
+
+
+      <!-- PENDING -->
+      <div class="summary-card">
+
+        <div class="summary-card-header">
+          <span class="summary-icon pending-icon">◷</span>
+          <span class="summary-type">PENDING DTC</span>
+        </div>
+
+        <div class="summary-value">{{ count('07') }}</div>
+
+        <p>Detected but not confirmed codes</p>
+
+        <div class="summary-footer">
+          Mode 07
+        </div>
+
+      </div>
+
+
+      <!-- PERMANENT -->
+      <div class="summary-card">
+
+        <div class="summary-card-header">
+          <span class="summary-icon permanent-icon">◆</span>
+          <span class="summary-type">PERMANENT DTC</span>
+        </div>
+
+        <div class="summary-value">{{ count('0A') }}</div>
+
+        <p>Permanent diagnostic codes</p>
+
+        <div class="summary-footer">
+          Mode 0A
+        </div>
+
+      </div>
+
+
+      <!-- ECU -->
+      <div class="summary-card">
+
+        <div class="summary-card-header">
+          <span class="summary-icon ecu-icon">▤</span>
+          <span class="summary-type">ECU RESPONSE</span>
+        </div>
+
+        <div class="summary-value">{{ adapter.vehicleResponding() ? 'OK' : '--' }}</div>
+
+        <p>Responding control units</p>
+
+        <div class="summary-footer">
+          Module detection
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- DTC RESULTS -->
+  <section class="results-section">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-label">TROUBLE CODE ANALYSIS</span>
+        <h2>Diagnostic Trouble Codes</h2>
+      </div>
+
+      @if (confirmingClear()) {
+        <div class="clear-confirm">
+          <span>Clears codes and freeze frame data. Engine off, ignition on.</span>
+          <button class="clear-dtc-button" type="button" (click)="clearCodes()">Confirm</button>
+          <button class="clear-dtc-button" type="button" (click)="confirmingClear.set(false)">Cancel</button>
+        </div>
+      } @else {
+        <button
+          class="clear-dtc-button"
+          type="button"
+          [disabled]="!canScan() || !scanner.hasScanned()"
+          (click)="requestClear()"
+        >
+          {{ scanner.clearing() ? 'Clearing...' : 'Clear DTC Codes' }}
+        </button>
+      }
+
+    </div>
+
+
+    <!-- TABS -->
+    <div class="dtc-tabs">
+
+      @for (tab of tabs; track tab.mode) {
+        <button
+          class="dtc-tab"
+          type="button"
+          [class.active]="activeMode() === tab.mode"
+          (click)="activeMode.set(tab.mode)"
+        >
+          {{ tab.label }}
+          <span>{{ count(tab.mode) }}</span>
+        </button>
+      }
+
+    </div>
+
+
+    <!-- EMPTY STATE -->
+    @for (finding of findings(); track finding.code) {
+      <article class="dtc-finding">
+        <strong>{{ finding.code }}</strong>
+        @if (finding.detail; as detail) {
+          <div>
+            <h3>{{ detail.titleKa }}</h3>
+            <p>{{ detail.descriptionKa }}</p>
+            @if (detail.details.causes.length) {
+              <ul>
+                @for (cause of detail.details.causes; track $index) {
+                  <li>{{ cause.ka }}</li>
+                }
+              </ul>
+            }
+          </div>
+        } @else {
+          <div>
+            <h3>Unknown code</h3>
+            <p>This code is not in the DTC catalog. It may be manufacturer specific.</p>
+          </div>
+        }
+      </article>
+    } @empty {
+      <div class="empty-results">
+
+        <div class="empty-results-icon">{{ scanner.hasScanned() ? '✓' : '⚠' }}</div>
+
+        <h3>{{ scanner.hasScanned() ? 'No Codes Found' : 'No Diagnostic Results' }}</h3>
+
+        <p>
+          {{ scanner.hasScanned()
+            ? 'The vehicle reported no trouble codes in this category.'
+            : 'Connect your OBD2 adapter and start a diagnostic scan to retrieve vehicle trouble codes.' }}
+        </p>
+
+      </div>
+    }
+
+  </section>
+
+
+  <!-- READINESS MONITORS -->
+  <section class="readiness-section">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-label">EMISSIONS SYSTEM</span>
+        <h2>Readiness Monitors</h2>
+      </div>
+
+      <span class="readiness-status">{{ scanner.vehicleStatus() ? 'AVAILABLE' : 'NOT AVAILABLE' }}</span>
+
+    </div>
+
+
+    <div class="readiness-grid">
+      @for (monitor of scanner.vehicleStatus()?.monitors ?? []; track monitor.name) {
+        <div class="readiness-item">
+          <span class="readiness-indicator" [class.is-ready]="monitor.state === 'ready'"></span>
+          <span>{{ monitor.name }}</span>
+          <strong>{{ monitorLabels[monitor.state] }}</strong>
+        </div>
+      }
+    </div>
+
+    <p class="readiness-description">
+      Readiness monitor availability depends on vehicle support
+      and the diagnostic protocol.
+    </p>
+
+  </section>
+
+
+  <!-- LAST SCAN INFORMATION -->
+  <section class="last-scan-card">
+
+    <div class="last-scan-icon">◷</div>
+
+    <div class="last-scan-info">
+      <span class="section-label">LAST DIAGNOSTIC SESSION</span>
+      <h3>{{ scanner.hasScanned() ? 'Latest scan in this session' : 'No previous scan' }}</h3>
+      <p>Your diagnostic history will appear here.</p>
+    </div>
+
+    <div class="last-scan-date">
+      {{ scanner.scannedAt() ? (scanner.scannedAt() | date: 'dd.MM.yyyy HH:mm') : 'NOT AVAILABLE' }}
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <div class="dtc-footer">
+    <span>OBD360 DIAGNOSTIC PLATFORM</span>
+    <span>OBD-II TROUBLE CODE ANALYSIS</span>
+  </div>
+
+</div>

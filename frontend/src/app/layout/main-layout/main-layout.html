@@ -1,0 +1,147 @@
+<div class="app-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- LOGO -->
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">O</span>
+        <span class="logo-text">OBD<span>360</span></span>
+      </div>
+
+      <span class="version">WEB PLATFORM</span>
+    </div>
+
+    <!-- CONNECTION STATUS -->
+    <div class="connection-card">
+      <div class="connection-indicator" [class.connected]="adapter.isConnected()"></div>
+
+      <div class="connection-info">
+        <span class="connection-title">Adapter Status</span>
+        <span class="connection-status">{{ adapter.isConnected() ? 'Connected' : 'Disconnected' }}</span>
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="sidebar-navigation">
+
+      <span class="nav-heading">MAIN MENU</span>
+
+      <a routerLink="/app/dashboard" routerLinkActive="active">
+        <span class="nav-icon">▦</span>
+        <span>Dashboard</span>
+      </a>
+
+      <a routerLink="/app/garage" routerLinkActive="active">
+        <span class="nav-icon">🚘</span>
+        <span>Garage</span>
+      </a>
+
+      <a routerLink="/app/reminders" routerLinkActive="active">
+        <span class="nav-icon">◷</span>
+        <span>Reminders</span>
+      </a>
+
+      <span class="nav-heading">CONNECTION</span>
+
+      <a routerLink="/app/bluetooth" routerLinkActive="active">
+        <span class="nav-icon">◉</span>
+        <span>Bluetooth Adapter</span>
+      </a>
+
+      <span class="nav-heading">DIAGNOSTICS</span>
+
+      <a routerLink="/app/live-data" routerLinkActive="active">
+        <span class="nav-icon">⌁</span>
+        <span>Live Data</span>
+      </a>
+
+      <a routerLink="/app/dtc-scanner" routerLinkActive="active">
+        <span class="nav-icon">⚠</span>
+        <span>DTC Scanner</span>
+      </a>
+
+      <a routerLink="/app/ecu-modules" routerLinkActive="active">
+        <span class="nav-icon">▤</span>
+        <span>ECU Modules</span>
+      </a>
+
+      <a routerLink="/app/graphs" routerLinkActive="active">
+        <span class="nav-icon">◈</span>
+        <span>Graphs</span>
+      </a>
+
+      <span class="nav-heading">DATABASE</span>
+
+      <a routerLink="/app/scan-history" routerLinkActive="active">
+        <span class="nav-icon">◷</span>
+        <span>Scan History</span>
+      </a>
+
+      <span class="nav-heading">ASSISTANT</span>
+
+      <a routerLink="/app/ai-assistant" routerLinkActive="active">
+        <span class="nav-icon">✦</span>
+        <span>AI Assistant</span>
+      </a>
+
+      <span class="nav-heading">PREFERENCES</span>
+
+      <a routerLink="/app/settings" routerLinkActive="active">
+        <span class="nav-icon">⚙</span>
+        <span>Settings</span>
+      </a>
+
+    </nav>
+
+    <!-- SIDEBAR FOOTER -->
+    <div class="sidebar-footer">
+      <div class="user-avatar">{{ userInitial() }}</div>
+
+      <div class="user-info">
+        <span class="user-name">{{ currentUser()?.displayName }}</span>
+        <span class="user-role">{{ userRole() }}</span>
+      </div>
+
+      <button type="button" class="logout-button" (click)="logout()">გასვლა</button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- RIGHT CONTENT -->
+  <div class="main-section">
+
+    <!-- TOP HEADER -->
+    <header class="top-header">
+
+      <div class="header-left">
+        <span class="header-label">DIAGNOSTIC PLATFORM</span>
+      </div>
+
+      <div class="header-right">
+
+        <div class="vehicle-indicator">
+          <span class="vehicle-dot"></span>
+          <span>No vehicle selected</span>
+        </div>
+
+        <div class="header-profile">
+          <div class="profile-avatar">{{ userInitial() }}</div>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- DYNAMIC PAGE CONTENT -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

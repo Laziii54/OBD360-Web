@@ -1,0 +1,231 @@
+<div class="history-page">
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div>
+      <span class="page-label">DIAGNOSTICS / SCAN HISTORY</span>
+      <h1>Scan History</h1>
+      <p>Review previous vehicle diagnostic sessions and their results.</p>
+    </div>
+
+    <div class="history-status">
+      <span class="status-dot"></span>
+      SESSION HISTORY
+    </div>
+  </header>
+
+
+  <!-- SUMMARY -->
+  <section class="summary-grid">
+
+    <div class="summary-card">
+      <div class="summary-icon total-icon">◷</div>
+      <div>
+        <span>TOTAL SCANS</span>
+        <h2>{{ scans().length }}</h2>
+        <p>All diagnostic sessions</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon success-icon">✓</div>
+      <div>
+        <span>COMPLETED SCANS</span>
+        <h2>{{ completed() }}</h2>
+        <p>Successfully completed</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon error-icon">⚠</div>
+      <div>
+        <span>DETECTED FAULTS</span>
+        <h2>{{ faults() }}</h2>
+        <p>Total recorded DTC codes</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon vehicle-icon">🚘</div>
+      <div>
+        <span>SCANNED VEHICLES</span>
+        <h2>{{ vehicles() }}</h2>
+        <p>Unique vehicles scanned</p>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- FILTERS -->
+  <section class="filter-card">
+
+    <div class="filter-heading">
+      <div>
+        <span class="section-label">SESSION MANAGEMENT</span>
+        <h2>Diagnostic Sessions</h2>
+      </div>
+
+    </div>
+
+    <div class="filter-controls">
+      <div class="search-field">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Search by vehicle, VIN or DTC code..."
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        >
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- HISTORY TABLE -->
+  <section class="history-card">
+
+    <div class="table-heading">
+      <div>
+        <span class="section-label">RECORDS</span>
+        <h2>Diagnostic History</h2>
+      </div>
+
+      <span class="records-count">{{ filtered().length }} RECORDS</span>
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>SESSION</th>
+            <th>VEHICLE</th>
+            <th>DATE & TIME</th>
+            <th>DTC CODES</th>
+            <th>DURATION</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (scan of filtered(); track scan.id; let index = $index) {
+            <tr>
+              <td>#{{ filtered().length - index }}</td>
+              <td>{{ scan.vehicle }}</td>
+              <td>{{ scan.startedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+              <td>{{ scan.codes.length ? scan.codes.join(', ') : 'No codes' }}</td>
+              <td>{{ duration(scan) }}</td>
+              <td>{{ scan.endedAt ? 'Completed' : 'Interrupted' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6">
+                <div class="empty-history">
+                  <div class="empty-icon">◷</div>
+                  <h3>{{ failed() ? 'History could not be loaded' : 'No Diagnostic History' }}</h3>
+                  <p>
+                    Your previous vehicle scans will appear here.
+                    Start your first diagnostic scan to create a session.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- TABLE FOOTER -->
+    <div class="table-footer">
+      <span>Showing {{ filtered().length }} diagnostic sessions</span>
+    </div>
+
+  </section>
+
+
+  <!-- RECENT ACTIVITY -->
+  <section class="activity-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">ACTIVITY OVERVIEW</span>
+        <h2>Diagnostic Activity</h2>
+      </div>
+    </div>
+
+
+    <div class="activity-grid">
+
+      <div class="activity-card">
+
+        <div class="activity-icon scan-icon">⌕</div>
+
+        <div>
+          <h3>Last Diagnostic Scan</h3>
+          <p>{{ latest() ? (latest()!.startedAt | date: 'dd.MM.yyyy HH:mm') : 'No previous scan available.' }}</p>
+        </div>
+
+      </div>
+
+
+      <div class="activity-card">
+
+        <div class="activity-icon vehicle-activity-icon">🚘</div>
+
+        <div>
+          <h3>Last Scanned Vehicle</h3>
+          <p>{{ latest()?.vehicle ?? 'No vehicle recorded.' }}</p>
+        </div>
+
+      </div>
+
+
+      <div class="activity-card">
+
+        <div class="activity-icon time-icon">◷</div>
+
+        <div>
+          <h3>Last Session Duration</h3>
+          <p>{{ latest() ? duration(latest()!) : 'Not available.' }}</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- INFORMATION -->
+  <section class="history-notice">
+
+    <div class="notice-icon">ⓘ</div>
+
+    <div>
+      <h3>About Diagnostic History</h3>
+
+      <p>
+        Each diagnostic session can store vehicle information,
+        detected trouble codes, sensor readings, scan duration
+        and diagnostic results. Previous sessions can be reviewed
+        without reconnecting to the vehicle.
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer class="history-footer">
+    <span>OBD360 DIAGNOSTIC PLATFORM</span>
+    <span>DIAGNOSTIC SESSION ARCHIVE</span>
+  </footer>
+
+</div>

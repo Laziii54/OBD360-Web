@@ -1,0 +1,143 @@
+<div class="catalog-page">
+
+  <header class="catalog-header">
+    <div>
+      <span class="page-label">DATABASE / DTC CATALOG</span>
+      <h1>DTC Catalog</h1>
+      <p>{{ labels().subtitle }}</p>
+    </div>
+
+    <div class="language-switch">
+      <button type="button" [class.active]="language() === 'ka'" (click)="language.set('ka')">ქართული</button>
+      <button type="button" [class.active]="language() === 'en'" (click)="language.set('en')">English</button>
+    </div>
+  </header>
+
+  <input
+    class="search-input"
+    type="search"
+    [placeholder]="labels().search"
+    [value]="search()"
+    (input)="onSearch($any($event.target).value)"
+  />
+
+  <div class="category-list">
+    @for (item of categories; track item) {
+      <button type="button" [class.active]="category() === item" (click)="selectCategory(item)">
+        {{ label(item || 'all') }}
+      </button>
+    }
+  </div>
+
+  @if (failed()) {
+    <p class="message error">{{ labels().failed }}</p>
+  } @else if (result(); as data) {
+    <p class="result-count">{{ data.total }} {{ labels().results }}</p>
+
+    <div class="code-list">
+      @for (item of data.items; track item.code) {
+        <button type="button" class="code-row" (click)="open(item.code)">
+          <strong>{{ item.code }}</strong>
+          <span class="code-title">{{ title(item) }}</span>
+          <span class="code-category">{{ label(item.category) }}</span>
+        </button>
+      } @empty {
+        <p class="message">{{ labels().empty }}</p>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button type="button" [disabled]="page() === 1" (click)="page.set(page() - 1)">{{ labels().previous }}</button>
+        <span>{{ page() }} / {{ totalPages() }}</span>
+        <button type="button" [disabled]="page() === totalPages()" (click)="page.set(page() + 1)">{{ labels().next }}</button>
+      </div>
+    }
+  } @else if (loading()) {
+    <p class="message">{{ labels().loading }}</p>
+  }
+
+</div>
+
+@if (selected(); as item) {
+  <div class="drawer-backdrop" (click)="close()"></div>
+
+  <aside class="drawer">
+    <div class="drawer-header">
+      <div>
+        <span class="page-label">{{ label(item.category) }}</span>
+        <h2>{{ item.code }}</h2>
+      </div>
+      <button type="button" (click)="close()">{{ labels().close }}</button>
+    </div>
+
+    <h3>{{ title(item) }}</h3>
+    <p>{{ description(item) }}</p>
+
+    @if (item.details.causes.length) {
+      <h4>{{ labels().causes }}</h4>
+      <ul>
+        @for (cause of item.details.causes; track $index) {
+          <li>
+            {{ text(cause) }}
+            <span [class]="'tag ' + cause.likelihood">{{ label(cause.likelihood) }}</span>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (item.details.symptoms.length) {
+      <h4>{{ labels().symptoms }}</h4>
+      <ul>
+        @for (symptom of item.details.symptoms; track $index) {
+          <li>{{ text(symptom) }}</li>
+        }
+      </ul>
+    }
+
+    @if (item.difficulty !== 'unknown') {
+      <h4>{{ labels().repair }}</h4>
+      <dl>
+        <dt>{{ labels().difficulty }}</dt>
+        <dd>{{ label(item.difficulty) }}</dd>
+        <dt>{{ labels().diy }}</dt>
+        <dd>{{ item.diyPossible ? labels().yes : labels().no }}</dd>
+        @if (item.estimatedCostMax !== null) {
+          <dt>{{ labels().cost }}</dt>
+          <dd>€{{ item.estimatedCostMin }}–{{ item.estimatedCostMax }}</dd>
+        }
+        @if (item.estimatedHoursMax !== null) {
+          <dt>{{ labels().hours }}</dt>
+          <dd>{{ item.estimatedHoursMin }}–{{ item.estimatedHoursMax }} h</dd>
+        }
+      </dl>
+    }
+
+    @if (item.details.affectedComponents.length) {
+      <h4>{{ labels().components }}</h4>
+      <div class="chips">
+        @for (component of item.details.affectedComponents; track component) {
+          <span>{{ componentName(component) }}</span>
+        }
+      </div>
+    }
+
+    @if (item.details.relatedCodes.length) {
+      <h4>{{ labels().related }}</h4>
+      <div class="chips">
+        @for (code of item.details.relatedCodes; track code) {
+          <button type="button" (click)="open(code)">{{ code }}</button>
+        }
+      </div>
+    }
+
+    @if (item.details.sources.length) {
+      <h4>{{ labels().sources }}</h4>
+      <ul class="sources">
+        @for (source of item.details.sources; track source) {
+          <li><a [href]="source" target="_blank" rel="noopener noreferrer">{{ source }}</a></li>
+        }
+      </ul>
+    }
+  </aside>
+}

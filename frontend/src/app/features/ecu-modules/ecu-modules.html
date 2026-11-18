@@ -1,0 +1,259 @@
+<div class="ecu-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <span class="page-label">DIAGNOSTICS / CONTROL MODULES</span>
+      <h1>ECU Modules</h1>
+      <p>
+        Discover, inspect and diagnose electronic control units
+        across your vehicle.
+      </p>
+    </div>
+
+    <div class="ecu-status">
+      <span class="status-dot"></span>
+      {{ adapter.isConnected() ? 'CONNECTED' : 'NOT CONNECTED' }}
+    </div>
+  </div>
+
+
+  <!-- VEHICLE OVERVIEW -->
+  <section class="vehicle-card">
+
+    <div class="vehicle-main">
+
+      <div class="vehicle-icon">🚘</div>
+
+      <div class="vehicle-information">
+        <span class="section-label">CURRENT VEHICLE</span>
+        <h2>No vehicle selected</h2>
+        <p>Connect your OBD2 adapter to discover available control modules.</p>
+      </div>
+
+    </div>
+
+    <div class="adapter-indicator">
+      <span></span>
+      <div>
+        <strong>{{ adapter.adapterName() ?? 'Adapter Disconnected' }}</strong>
+        <small>{{ adapter.protocol() ?? 'Waiting for connection' }}</small>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- MODULE SCANNER CONTROL -->
+  <section class="module-scanner">
+
+    <div class="scanner-content">
+
+      <span class="section-label">CONTROL UNIT DISCOVERY</span>
+
+      <h2>Vehicle Module Scanner</h2>
+
+      <p>
+        Scan your vehicle to identify responding electronic
+        control modules and retrieve available diagnostic information.
+      </p>
+
+      <div class="scanner-features">
+
+        <div>
+          <span>✓</span>
+          Module Discovery
+        </div>
+
+        <div>
+          <span>✓</span>
+          ECU Identification
+        </div>
+
+        <div>
+          <span>✓</span>
+          Module DTC Detection
+        </div>
+
+        <div>
+          <span>✓</span>
+          Communication Status
+        </div>
+
+      </div>
+
+      <button
+        class="scan-modules-button"
+        type="button"
+        [disabled]="!adapter.isConnected() || scanning()"
+        (click)="scan()"
+      >
+        <span>⌕</span>
+        {{ scanning() ? 'Scanning...' : 'Start Module Scan' }}
+      </button>
+
+      <small class="scanner-note">
+        {{ errorMessage() ?? 'Standard OBD-II shows only modules that answer emissions requests.' }}
+      </small>
+
+    </div>
+
+    <div class="scanner-graphic">
+
+      <div class="graphic-circle">
+        <div class="graphic-inner">
+          <span>ECU</span>
+          <strong>SCAN</strong>
+        </div>
+      </div>
+
+      <span class="graphic-caption">ELECTRONIC CONTROL UNITS</span>
+
+    </div>
+
+  </section>
+
+
+  <!-- MODULE SUMMARY -->
+  <section class="summary-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">DISCOVERY SUMMARY</span>
+        <h2>Module Overview</h2>
+      </div>
+
+      <span class="summary-badge">{{ summaryLabel() }}</span>
+    </div>
+
+
+    <div class="summary-grid">
+
+      <div class="summary-card">
+
+        <div class="summary-icon total-icon">▤</div>
+
+        <div>
+          <span>TOTAL MODULES</span>
+          <h3>{{ scanned() ? modules().length : '--' }}</h3>
+          <p>Discovered modules</p>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon online-icon">◉</div>
+
+        <div>
+          <span>RESPONDING</span>
+          <h3>{{ scanned() ? modules().length : '--' }}</h3>
+          <p>Communication established</p>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon error-icon">⚠</div>
+
+        <div>
+          <span>MODULE FAULTS</span>
+          <h3>--</h3>
+          <p>Reported diagnostic faults</p>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-icon offline-icon">○</div>
+
+        <div>
+          <span>NOT RESPONDING</span>
+          <h3>--</h3>
+          <p>Expected or configured modules</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- MODULE CATEGORIES -->
+  <section class="modules-section">
+
+    <div class="section-heading">
+
+      <div>
+        <span class="section-label">VEHICLE ELECTRONICS</span>
+        <h2>Control Modules</h2>
+      </div>
+
+    </div>
+
+
+    <div class="modules-grid">
+      @for (module of modules(); track module.address) {
+        <article class="module-card">
+
+          <div class="module-card-header">
+            <div class="module-icon powertrain-icon">⚙</div>
+            <span class="module-status">RESPONDING</span>
+          </div>
+
+          <span class="module-category">OBD-II</span>
+
+          <h3>{{ module.name }}</h3>
+
+          <p>{{ module.description }}</p>
+
+          <div class="module-details">
+            <div>
+              <span>Module Address</span>
+              <strong>{{ module.address }}</strong>
+            </div>
+          </div>
+
+        </article>
+      } @empty {
+        <p class="scanner-note">
+          {{ scanned() ? 'No modules answered.' : 'Run a module scan to list responding modules.' }}
+        </p>
+      }
+    </div>
+
+  </section>
+
+
+  <!-- IMPORTANT INFORMATION -->
+  <section class="module-notice">
+
+    <div class="notice-icon">ⓘ</div>
+
+    <div>
+      <h3>Vehicle Compatibility Information</h3>
+
+      <p>
+        Available control modules depend on the vehicle manufacturer,
+        model, year, diagnostic protocol and adapter capabilities.
+        Some modules require manufacturer-specific diagnostic access
+        and cannot be accessed through standard OBD-II commands.
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <div class="ecu-footer">
+    <span>OBD360 DIAGNOSTIC PLATFORM</span>
+    <span>ECU MODULE DISCOVERY</span>
+  </div>
+
+</div>

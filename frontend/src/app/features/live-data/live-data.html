@@ -1,0 +1,210 @@
+<div class="live-data-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <span class="page-label">DIAGNOSTICS / LIVE MONITORING</span>
+      <h1>Live Data</h1>
+      <p>Monitor your vehicle sensors and engine parameters in real time.</p>
+    </div>
+
+    <div class="live-status">
+      <span class="status-dot"></span>
+      {{ statusLabel() }}
+    </div>
+  </div>
+
+
+  <!-- CONTROL BAR -->
+  <section class="control-bar">
+
+    <div class="vehicle-info">
+      <div class="vehicle-icon">🚘</div>
+
+      <div>
+        <span>SELECTED VEHICLE</span>
+        <strong>No vehicle selected</strong>
+      </div>
+    </div>
+
+    <div class="control-actions">
+
+      <div class="refresh-control">
+        <label for="refresh-rate">Refresh Rate</label>
+
+        <select
+          id="refresh-rate"
+          [disabled]="!adapter.isConnected()"
+          (change)="live.refreshMs.set(+$any($event.target).value)"
+        >
+          @for (rate of refreshRates; track rate) {
+            <option [value]="rate" [selected]="rate === live.refreshMs()">{{ rate }} ms</option>
+          }
+        </select>
+      </div>
+
+      <button class="pause-button" type="button" [disabled]="!adapter.isConnected()" (click)="togglePause()">
+        {{ live.paused() ? '▶ Resume' : '▌▌ Pause' }}
+      </button>
+
+      <button class="clear-button" type="button" [disabled]="!live.hasData()" (click)="live.clear()">
+        Clear Data
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- SENSOR OVERVIEW -->
+  <section class="sensor-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">ENGINE PARAMETERS</span>
+        <h2>Sensor Overview</h2>
+      </div>
+
+      <span class="sensor-count">08 PARAMETERS</span>
+    </div>
+
+
+    <div class="sensor-grid">
+      @for (pid of pids; track pid.id) {
+        <div class="sensor-card">
+
+          <div class="sensor-card-top">
+            <span [class]="'sensor-icon ' + pid.iconClass">{{ pid.icon }}</span>
+            <span class="sensor-category">{{ pid.category }}</span>
+          </div>
+
+          <span class="sensor-name">{{ pid.name }}</span>
+
+          <div class="sensor-value">
+            {{ display(pid) }} <span>{{ unit(pid) }}</span>
+          </div>
+
+          <div class="sensor-footer">
+            <span>PID {{ pid.pid }}</span>
+            <span class="waiting-label">{{ state(pid) }}</span>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </section>
+
+
+  <!-- CHART SECTION -->
+  <section class="chart-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">REAL-TIME PERFORMANCE</span>
+        <h2>Live Sensor Graph</h2>
+      </div>
+
+      <select class="chart-select" (change)="chartPid.set($any($event.target).value)">
+        @for (pid of pids; track pid.id) {
+          <option [value]="pid.id" [selected]="pid.id === chartPid()">{{ pid.name }}</option>
+        }
+      </select>
+    </div>
+
+
+    <div class="chart-container">
+
+      <div class="chart-y-labels">
+        <span>MAX</span>
+        <span>75%</span>
+        <span>50%</span>
+        <span>25%</span>
+        <span>MIN</span>
+      </div>
+
+      <div class="chart-content">
+
+        <div class="chart-grid">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        @if (chartPoints()) {
+          <svg class="live-chart" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline [attr.points]="chartPoints()" />
+          </svg>
+        } @else {
+          <div class="chart-empty">
+
+            <div class="chart-empty-icon">⌁</div>
+
+            <h3>No Live Data Available</h3>
+
+            <p>
+              Connect your OBD2 adapter to start collecting
+              real-time sensor measurements.
+            </p>
+
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+    <div class="chart-footer">
+      <span>● Live Data Stream</span>
+      <span>{{ live.hasData() ? chartValues().length + ' samples' : 'Waiting for ECU communication' }}</span>
+    </div>
+
+  </section>
+
+
+  <!-- SUPPORTED PARAMETERS -->
+  <section class="parameters-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">OBD-II DATA</span>
+        <h2>Sensor Parameters</h2>
+      </div>
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>PID</th>
+            <th>PARAMETER</th>
+            <th>VALUE</th>
+            <th>UNIT</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (pid of pids; track pid.id) {
+            <tr>
+              <td>{{ pid.pid }}</td>
+              <td>{{ pid.name }}</td>
+              <td>{{ display(pid) }}</td>
+              <td>{{ unit(pid) }}</td>
+              <td><span class="table-status">{{ state(pid) }}</span></td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</div>

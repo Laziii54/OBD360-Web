@@ -1,0 +1,184 @@
+<div class="garage-page">
+
+  <header class="page-header">
+    <div>
+      <span class="page-label">GARAGE / VEHICLES</span>
+      <h1>My Garage</h1>
+      <p>Manage the vehicles you diagnose with OBD360.</p>
+    </div>
+
+    <button type="button" class="add-button" (click)="startCreate()">
+      <span>+</span>
+      Add Vehicle
+    </button>
+  </header>
+
+  <section class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon vehicle-icon">🚘</div>
+      <div>
+        <span>VEHICLES</span>
+        <h2>{{ vehicles().length }}</h2>
+        <p>In your garage</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon scan-icon">◷</div>
+      <div>
+        <span>TOTAL SCANS</span>
+        <h2>{{ totalScans() }}</h2>
+        <p>Across all vehicles</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon clock-icon">⌁</div>
+      <div>
+        <span>LATEST SCAN</span>
+        <h2 class="date-value">{{ latestScan() ? (latestScan() | date: 'dd.MM.yy') : '—' }}</h2>
+        <p>{{ latestScan() ? (latestScan() | date: 'HH:mm') : 'No scans yet' }}</p>
+      </div>
+    </div>
+  </section>
+
+  @if (showForm()) {
+    <section class="form-card">
+      <div class="form-header">
+        <div>
+          <span class="section-label">{{ editing() ? 'EDIT VEHICLE' : 'NEW VEHICLE' }}</span>
+          <h2>{{ editing() ? 'Edit vehicle' : 'Add a vehicle' }}</h2>
+          <p>Vehicle details are used to personalise scans, history and AI reports.</p>
+        </div>
+
+        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">✕</button>
+      </div>
+
+      <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
+        <div class="form-grid">
+
+          <label class="field">
+            <span>Make *</span>
+            <input type="text" formControlName="make" placeholder="Chevrolet" autocomplete="off">
+            @if (form.controls.make.touched && form.controls.make.invalid) {
+              <small>მიუთითე მარკა.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Model *</span>
+            <input type="text" formControlName="model" placeholder="Volt" autocomplete="off">
+            @if (form.controls.model.touched && form.controls.model.invalid) {
+              <small>მიუთითე მოდელი.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Year *</span>
+            <input type="number" formControlName="year" min="1900" max="2100">
+            @if (form.controls.year.touched && form.controls.year.invalid) {
+              <small>წელი უნდა იყოს 1900–2100.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>VIN</span>
+            <input type="text" formControlName="vin" maxlength="17" placeholder="17 characters (optional)" autocomplete="off">
+            @if (form.controls.vin.touched && form.controls.vin.invalid) {
+              <small>VIN უნდა შედგებოდეს 17 სიმბოლოსგან.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Plate number</span>
+            <input type="text" formControlName="plateNumber" maxlength="20" placeholder="AA-123-BB" autocomplete="off">
+          </label>
+
+        </div>
+
+        @if (formError()) {
+          <p class="form-error">{{ formError() }}</p>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="secondary-button" (click)="cancel()">Cancel</button>
+          <button type="submit" class="primary-button" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : (editing() ? 'Save Changes' : 'Add Vehicle') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="list-card">
+    <div class="list-header">
+      <div>
+        <span class="section-label">VEHICLE LIST</span>
+        <h2>Your vehicles</h2>
+      </div>
+
+      <div class="search-field">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Search make, model, VIN or plate..."
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        >
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="state-message">იტვირთება...</p>
+    } @else if (failed()) {
+      <p class="state-message is-error">მანქანები ვერ ჩაიტვირთა. სცადე ხელახლა.</p>
+    } @else if (!filtered().length) {
+      <div class="empty-state">
+        <span>🚘</span>
+        <h3>No vehicles yet</h3>
+        <p>დაამატე პირველი მანქანა, რომ დაიწყო დიაგნოსტიკა.</p>
+        <button type="button" class="primary-button" (click)="startCreate()">Add your first vehicle</button>
+      </div>
+    } @else {
+      <div class="vehicle-grid">
+        @for (vehicle of filtered(); track vehicle.id) {
+          <article class="vehicle-card">
+            <div class="vehicle-card-top">
+              <div class="vehicle-icon">🚘</div>
+
+              <div class="vehicle-title">
+                <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
+                <span>{{ vehicle.year }}</span>
+              </div>
+
+              <div class="vehicle-actions">
+                <button type="button" class="icon-button" (click)="startEdit(vehicle)" title="Edit">✎</button>
+                <button type="button" class="icon-button danger" (click)="remove(vehicle)" title="Delete">🗑</button>
+              </div>
+            </div>
+
+            <dl class="vehicle-meta">
+              <div>
+                <dt>VIN</dt>
+                <dd>{{ vehicle.vin || '—' }}</dd>
+              </div>
+              <div>
+                <dt>Plate</dt>
+                <dd>{{ vehicle.plateNumber || '—' }}</dd>
+              </div>
+              <div>
+                <dt>Scans</dt>
+                <dd>{{ vehicle.scanCount }}</dd>
+              </div>
+              <div>
+                <dt>Last scan</dt>
+                <dd>{{ vehicle.lastScanAt ? (vehicle.lastScanAt | date: 'dd.MM.yyyy HH:mm') : '—' }}</dd>
+              </div>
+            </dl>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+</div>

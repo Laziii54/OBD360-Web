@@ -1,0 +1,201 @@
+<div class="reminders-page">
+
+  <header class="page-header">
+    <div>
+      <span class="page-label">MAINTENANCE / REMINDERS</span>
+      <h1>Maintenance Reminders</h1>
+      <p>Never miss an oil change, inspection or service interval.</p>
+    </div>
+
+    <button type="button" class="add-button" (click)="startCreate()">
+      <span>+</span>
+      Add Reminder
+    </button>
+  </header>
+
+  <section class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon pending-icon">◷</div>
+      <div>
+        <span>PENDING</span>
+        <h2>{{ pending() }}</h2>
+        <p>Upcoming maintenance</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon overdue-icon">⚠</div>
+      <div>
+        <span>OVERDUE</span>
+        <h2>{{ overdue() }}</h2>
+        <p>Needs attention now</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon done-icon">✓</div>
+      <div>
+        <span>COMPLETED</span>
+        <h2>{{ done() }}</h2>
+        <p>Finished maintenance</p>
+      </div>
+    </div>
+  </section>
+
+  @if (showForm()) {
+    <section class="form-card">
+      <div class="form-header">
+        <div>
+          <span class="section-label">{{ editing() ? 'EDIT REMINDER' : 'NEW REMINDER' }}</span>
+          <h2>{{ editing() ? 'Edit reminder' : 'Add a maintenance reminder' }}</h2>
+          <p>Choose a vehicle, service type and a due date or mileage.</p>
+        </div>
+
+        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">✕</button>
+      </div>
+
+      <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
+        <div class="form-grid">
+
+          <label class="field">
+            <span>Vehicle *</span>
+            <select formControlName="vehicleId">
+              <option value="" disabled>Select a vehicle</option>
+              @for (vehicle of vehicles(); track vehicle.id) {
+                <option [value]="vehicle.id">{{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})</option>
+              }
+            </select>
+            @if (!vehicles().length) {
+              <small>ჯერ დაამატე მანქანა <a routerLink="/app/garage">Garage</a>-ში.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Service type *</span>
+            <input
+              type="text"
+              formControlName="type"
+              list="reminder-types"
+              placeholder="Oil change"
+              autocomplete="off"
+            >
+            <datalist id="reminder-types">
+              <option value="Oil change"></option>
+              <option value="Oil filter"></option>
+              <option value="Tire rotation"></option>
+              <option value="Brake inspection"></option>
+              <option value="Air filter"></option>
+              <option value="Coolant flush"></option>
+              <option value="Technical inspection"></option>
+            </datalist>
+            @if (form.controls.type.touched && form.controls.type.invalid) {
+              <small>მიუთითე მომსახურების ტიპი.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Due at km</span>
+            <input type="number" formControlName="dueAtKm" min="0" placeholder="e.g. 120000">
+          </label>
+
+          <label class="field">
+            <span>Due date</span>
+            <input type="date" formControlName="dueAtDate">
+          </label>
+
+        </div>
+
+        @if (formError()) {
+          <p class="form-error">{{ formError() }}</p>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="secondary-button" (click)="cancel()">Cancel</button>
+          <button type="submit" class="primary-button" [disabled]="saving() || !vehicles().length">
+            {{ saving() ? 'Saving...' : (editing() ? 'Save Changes' : 'Add Reminder') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="list-card">
+    <div class="list-header">
+      <div>
+        <span class="section-label">MAINTENANCE PLAN</span>
+        <h2>Upcoming and completed</h2>
+      </div>
+
+      <div class="filter-tabs">
+        <button type="button" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+          All <span>{{ reminders().length }}</span>
+        </button>
+        <button type="button" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">
+          Pending <span>{{ pending() }}</span>
+        </button>
+        <button type="button" [class.active]="filter() === 'overdue'" (click)="setFilter('overdue')">
+          Overdue <span>{{ overdue() }}</span>
+        </button>
+        <button type="button" [class.active]="filter() === 'done'" (click)="setFilter('done')">
+          Done <span>{{ done() }}</span>
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p class="state-message">იტვირთება...</p>
+    } @else if (failed()) {
+      <p class="state-message is-error">შეხსენებები ვერ ჩაიტვირთა. სცადე ხელახლა.</p>
+    } @else if (!reminders().length) {
+      <div class="empty-state">
+        <span>◷</span>
+        <h3>No reminders yet</h3>
+        <p>დაამატე პირველი შეხსენება, რომ არ გამოტოვო მომსახურება.</p>
+        <button type="button" class="primary-button" (click)="startCreate()">Add your first reminder</button>
+      </div>
+    } @else if (!filtered().length) {
+      <p class="state-message">ამ ფილტრში შეხსენება არ არის.</p>
+    } @else {
+      <div class="reminder-list">
+        @for (reminder of filtered(); track reminder.id) {
+          <article class="reminder-card" [class.is-done]="reminder.status === 'done'">
+            <div
+              class="reminder-status"
+              [class.status-pending]="reminder.status === 'pending'"
+              [class.status-overdue]="reminder.status === 'overdue'"
+              [class.status-done]="reminder.status === 'done'"
+            >
+              {{ reminder.status === 'pending' ? 'PENDING' : reminder.status === 'overdue' ? 'OVERDUE' : 'DONE' }}
+            </div>
+
+            <div class="reminder-main">
+              <h3>{{ reminder.type }}</h3>
+              <p>{{ reminder.vehicle }}</p>
+            </div>
+
+            <div class="reminder-due">
+              @if (reminder.dueAtDate) {
+                <span><b>Date:</b> {{ reminder.dueAtDate | date: 'dd.MM.yyyy' }}</span>
+              }
+              @if (reminder.dueAtKm) {
+                <span><b>Mileage:</b> {{ reminder.dueAtKm | number }} km</span>
+              }
+              @if (!reminder.dueAtDate && !reminder.dueAtKm) {
+                <span>No due date or mileage</span>
+              }
+            </div>
+
+            <div class="reminder-actions">
+              @if (reminder.status !== 'done') {
+                <button type="button" class="complete-button" (click)="complete(reminder)">Complete</button>
+              }
+              <button type="button" class="icon-button" (click)="startEdit(reminder)" title="Edit">✎</button>
+              <button type="button" class="icon-button danger" (click)="remove(reminder)" title="Delete">🗑</button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+</div>
