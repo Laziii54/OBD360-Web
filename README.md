@@ -1,0 +1,191 @@
+# OBD360 Web
+
+OBD360 Web არის ავტომობილის დიაგნოსტიკის ვებ-პლატფორმა, რომელიც მუშაობს OBD-II Bluetooth ადაპტერთან და აერთიანებს რეალურ დროში მონაცემებს, DTC კოდების ანალიზს, სკანირების ისტორიას, ტექნიკური მომსახურების შეხსენებებსა და AI ასისტენტს.
+
+## ფუნქციონალი
+
+- **რეგისტრაცია / ავტორიზაცია** — JWT access token + rotating refresh cookie.
+- **Garage** — მანქანების დამატება, რედაქტირება, წაშლა, ძებნა.
+- **Bluetooth** — Web Bluetooth-ით OBD-II ადაპტერთან დაკავშირება.
+- **Live Data** — ძრავის ბრუნი, სიჩქარე, ტემპერატურა და სხვა PID-ები.
+- **DTC Scanner** — შეცდომების კოდების წაკითხვა და გასუფთავება.
+- **DTC Catalog** — 13 000+ კოდის ქართული/ინგლისური აღწერა.
+- **ECU Modules / Freeze Frame / Graphs** — მოდულები, freeze frame და გრაფიკები.
+- **Scan History** — წინა სკანირებების ისტორია.
+- **Maintenance Reminders** — შეხსენებები თარიღით ან გარბენით.
+- **AI Assistant** — n8n + Google Gemini-ს მეშვეობით ქართულენოვანი დიაგნოსტიკური ახსნები.
+- **Critical DTC Alert** — n8n workflow კრიტიკული კოდებისთვის (Telegram).
+
+## არქიტექტურა
+
+| ფენა | ტექნოლოგია |
+|---|---|
+| Frontend | Angular 22, TypeScript, Signals, Web Bluetooth API |
+| Backend | ASP.NET Core Web API (.NET 10), EF Core, SQL Server |
+| Auth | ASP.NET Identity, JWT, refresh token cookie |
+| Automation | n8n 2.47.4, webhook workflows |
+| AI | Google Gemini (`gemini-3.1-flash-lite`) |
+| Tests | xUnit, 29 backend tests |
+
+C4 მოდელი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) — System Context, Container და Component დიაგრამები.
+
+## გაშვება
+
+### მოთხოვნები
+
+- .NET 10 SDK
+- Node.js 22+ და npm
+- SQL Server (LocalDB ან სრული ინსტანსი)
+- n8n 2.47.4 (სურვილისამებრ, AI ფუნქციისთვის)
+
+### 1. მონაცემთა ბაზა
+
+`backend/Obd360.Api/appsettings.Development.json`-ში ან user secrets-ში მიუთითე connection string:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=GeorgianCarScannerWeb;Trusted_Connection=True;TrustServerCertificate=True"
+}
+```
+
+API გაშვებისას ავტომატურად უშვებს EF Core მიგრაციებს და DTC კატალოგის seeder-ს.
+
+სუფთა ბაზისთვის შეგიძლია გამოიყენო:
+
+```powershell
+sqlcmd -S localhost -E -d GeorgianCarScannerWeb -i database/schema.sql
+sqlcmd -S localhost -E -d GeorgianCarScannerWeb -i database/seed.sql
+```
+
+### 2. Backend
+
+```powershell
+cd backend/Obd360.Api
+dotnet run
+```
+
+- API: http://localhost:5269
+- Swagger: http://localhost:5269/swagger
+- Health: http://localhost:5269/health/live
+
+JWT გასაღები user secrets-ში:
+
+```powershell
+dotnet user-secrets set "Jwt:SigningKey" "REPLACE_WITH_A_LONG_RANDOM_SECRET"
+```
+
+### 3. Frontend
+
+```powershell
+cd frontend
+npm install
+npm start
+```
+
+- Frontend: http://localhost:4200
+- პირველად გახსენი `Register`, შემდეგ `Login`.
+
+### 4. n8n
+
+```powershell
+n8n\start-n8n.cmd
+```
+
+n8n: http://localhost:5678
+
+workflow-ების იმპორტი:
+
+```powershell
+n8n import:workflow --input="n8n\obd360-scan-report.workflow.json"
+n8n import:workflow --input="n8n\obd360-assistant-ask.workflow.json"
+n8n import:workflow --input="n8n\obd360-critical-dtc.workflow.json"
+```
+
+AI workflow-ები იყენებს n8n-ში შენახულ `googlePalmApi` credential-ს. დეტალები: [n8n/README.md](n8n/README.md).
+
+#### Telegram alert
+
+`OBD360 Critical DTC Alert` workflow აგზავნის Telegram შეტყობინებას, თუ გაშვებამდე დააყენე:
+
+```powershell
+$env:OBD360_TELEGRAM_BOT_TOKEN = "123456:ABC..."
+$env:OBD360_TELEGRAM_CHAT_ID = "123456789"
+```
+
+Bot token: `@BotFather` → `/newbot`. Chat ID: `@userinfobot` ან `getUpdates`.
+თუ env ცვლადები არ არის დაყენებული, workflow იღებს მოთხოვნას, მაგრამ Telegram-ში არ აგზავნის.
+
+## API
+
+| მეთოდი | მისამართი | აღწერა |
+|---|---|---|
+| POST | `/api/v1/auth/register` | რეგისტრაცია |
+| POST | `/api/v1/auth/login` | ავტორიზაცია |
+| POST | `/api/v1/auth/refresh` | token-ის განახლება |
+| POST | `/api/v1/auth/logout` | გასვლა |
+| GET/PUT | `/api/v1/preferences` | პარამეტრები |
+| GET/POST | `/api/v1/vehicles` | მანქანების სია / დამატება |
+| GET/PUT/DELETE | `/api/v1/vehicles/{id}` | მანქანის ნახვა / რედაქტირება / წაშლა |
+| GET/POST | `/api/v1/reminders` | შეხსენებები |
+| PUT/DELETE | `/api/v1/reminders/{id}` | შეხსენების რედაქტირება / წაშლა |
+| POST | `/api/v1/reminders/{id}/complete` | შეხსენების დასრულება |
+| GET/POST | `/api/v1/scans` | სკანირების ისტორია / ახალი სკანირება |
+| GET | `/api/v1/dtc-catalog?search=&page=&pageSize=` | DTC კატალოგი |
+| GET | `/api/v1/dtc-catalog/{code}` | კოდის დეტალები |
+| GET | `/api/v1/ai/status` | AI ინტეგრაციის სტატუსი |
+| POST | `/api/v1/ai/latest-scan-report` | ბოლო სკანირების AI რეპორტი |
+| POST | `/api/v1/ai/ask` | AI ასისტენტის კითხვა |
+| GET | `/api/v1/ai/conversation` | საუბრის ისტორია |
+
+## ტესტები
+
+```powershell
+cd backend
+dotnet test
+```
+
+მიმდინარე შედეგი: **29/29 passed** — n8n კლიენტი/პრომპტები, vehicles და reminders კონტროლერები.
+
+## პროექტის სტრუქტურა
+
+```
+backend/
+  Obd360.Api/            Web API, controllers, n8n integration
+  Obd360.Core/           entities, enums
+  Obd360.Infrastructure/ EF Core DbContext, migrations, seeding
+  Obd360.Tests/          xUnit tests
+frontend/
+  src/app/core/          services, guards, interceptors
+  src/app/features/      dashboard, garage, reminders, bluetooth, ...
+  src/app/layout/        sidebar, topbar
+n8n/                     n8n workflows and start/stop scripts
+database/                schema.sql, seed.sql
+docs/c4/                 C4 diagrams (PDF)
+```
+
+## Docker
+
+```powershell
+docker compose up --build
+```
+
+სერვისები:
+
+- Frontend: http://localhost:4200
+- API: http://localhost:5269
+- n8n: http://localhost:5678
+- SQL Server: localhost:1433
+
+Docker გარემოში connection string, JWT და Telegram ცვლადები გადაეცემა `docker-compose.yml`-იდან. საჭიროების შემთხვევაში შეცვალე `SQL_PASSWORD` და `JWT_SIGNING_KEY`.
+
+## შეზღუდვები / Future work
+
+- ყოველკვირეული PDF რეპორტები (Reports) — მოდელი არსებობს, UI/API ჯერ არა.
+- Admin როლი — როლები seed-ილია, ადმინის UI/API ჯერ არა.
+- Email confirmation / password reset.
+- GitHub Actions CI/CD.
+- სრული ინტეგრაციული ტესტები რეალურ SQL Server-ზე.
+
+## ავტორი
+
+ზურაბ ლაზაშვილი — OBD360 Web, 2026.

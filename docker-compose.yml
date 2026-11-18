@@ -1,0 +1,73 @@
+name: obd360
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SQL_PASSWORD:-OBD360_StrongPass123}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Obd360.Api/Dockerfile
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=GeorgianCarScannerWeb;User Id=sa;Password=${SQL_PASSWORD:-OBD360_StrongPass123};TrustServerCertificate=True;MultipleActiveResultSets=true"
+      Jwt__Issuer: Obd360Web
+      Jwt__Audience: Obd360WebClient
+      Jwt__SigningKey: "${JWT_SIGNING_KEY:-OBD360_Docker_Development_Signing_Key_Change_Me_1234567890}"
+      Cors__AllowedOrigins__0: http://localhost:4200
+      N8n__BaseUrl: http://n8n:5678
+      N8n__AlertPath: /webhook/obd360/critical-dtc
+    ports:
+      - "5269:8080"
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
+
+  n8n:
+    image: n8nio/n8n:2.47.4
+    environment:
+      N8N_HOST: localhost
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: http
+      N8N_SECURE_COOKIE: "false"
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_TELEMETRY_ENABLED: "false"
+      OBD360_TELEGRAM_BOT_TOKEN: "${OBD360_TELEGRAM_BOT_TOKEN:-}"
+      OBD360_TELEGRAM_CHAT_ID: "${OBD360_TELEGRAM_CHAT_ID:-}"
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n-data:/home/node/.n8n
+      - ./n8n:/workflows:ro
+
+volumes:
+  sql-data:
+  n8n-data:
