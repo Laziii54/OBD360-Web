@@ -1,13 +1,13 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-hover: #192330;
-  --border: #263241;
-  --muted: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-hover: #f3f1eb;
+  --border: #e4e0d7;
+  --muted: #72776e;
+  --accent: #3f5d4e;
 }
 
 button {
@@ -93,7 +93,7 @@ button {
 }
 
 .message.error {
-  color: #ef4444;
+  color: #b3564d;
 }
 
 .code-list {
@@ -179,7 +179,7 @@ button {
   p,
   li,
   dd {
-    color: #cbd5e1;
+    color: #3e443d;
     font-size: 14px;
   }
 
@@ -226,11 +226,11 @@ button {
   font-weight: 700;
 
   &.high {
-    color: #ef4444;
+    color: #b3564d;
   }
 
   &.medium {
-    color: #f59e0b;
+    color: #b9863f;
   }
 
   &.low {
@@ -248,7 +248,7 @@ button {
     padding: 5px 9px;
     border: 1px solid var(--border);
     border-radius: 6px;
-    color: #cbd5e1;
+    color: #3e443d;
     font-size: 12px;
   }
 }

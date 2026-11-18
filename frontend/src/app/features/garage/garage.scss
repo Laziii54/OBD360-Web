@@ -1,15 +1,15 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
-  --danger: #ef4444;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
+  --danger: #b3564d;
 }
 
 .garage-page {
@@ -61,7 +61,7 @@
   min-height: 40px;
   padding: 0 18px;
 
-  color: #071710;
+  color: #ffffff;
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 8px;
@@ -73,8 +73,8 @@
   transition: 0.2s ease;
 
   &:hover {
-    background: #4be5ae;
-    border-color: #4be5ae;
+    background: #557566;
+    border-color: #557566;
   }
 
   &:disabled {
@@ -144,7 +144,7 @@
   justify-content: center;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
   border-radius: 9px;
 
   font-size: 19px;
@@ -189,7 +189,7 @@
 }
 
 .close-button {
-  width: 30px;
+  padding: 0 10px;
   height: 30px;
 
   color: var(--text-secondary);
@@ -197,12 +197,13 @@
   border: 1px solid var(--border);
   border-radius: 7px;
 
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 700;
   cursor: pointer;
 
   &:hover {
     color: var(--text-primary);
-    border-color: #3a4859;
+    border-color: var(--line-strong);
   }
 }
 
@@ -218,7 +219,7 @@
   gap: 7px;
 
   span {
-    color: #dbe3ed;
+    color: #2b302a;
     font-size: 11px;
     font-weight: 700;
   }
@@ -239,11 +240,11 @@
 
     &:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(49, 214, 155, 0.08);
+      box-shadow: 0 0 0 3px rgba(63, 93, 78, 0.08);
     }
 
     &::placeholder {
-      color: #657184;
+      color: #8a8f85;
     }
   }
 
@@ -345,7 +346,7 @@
     font-size: 11px;
 
     &::placeholder {
-      color: #657184;
+      color: #8a8f85;
     }
   }
 }
@@ -396,15 +397,15 @@
 .vehicle-card {
   padding: 17px;
 
-  background: var(--bg-secondary);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
 
-  transition: 0.2s ease;
+  transition: 0.18s ease;
 
   &:hover {
-    border-color: #3a4859;
-    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -424,7 +425,7 @@
   align-items: center;
   justify-content: center;
 
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
   border-radius: 9px;
 
   font-size: 17px;
@@ -452,33 +453,30 @@
 
 .vehicle-actions {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: 2px;
 }
 
-.icon-button {
-  width: 29px;
-  height: 29px;
+.text-button {
+  padding: 6px 8px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+  border: none;
   border-radius: 6px;
 
-  font-size: 12px;
-  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: 0.16s ease;
 
   &:hover {
     color: var(--accent);
-    border-color: var(--accent);
+    background: var(--accent-soft);
   }
 
   &.danger:hover {
     color: var(--danger);
-    border-color: var(--danger);
+    background: #f8ecea;
   }
 }
 
@@ -496,7 +494,7 @@
 
   dt {
     margin-bottom: 3px;
-    color: #667184;
+    color: #8a8f85;
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 1px;
@@ -508,7 +506,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    color: #cbd5e1;
+    color: #3e443d;
     font-size: 10px;
   }
 }

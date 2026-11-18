@@ -8,14 +8,12 @@
     </div>
 
     <button type="button" class="add-button" (click)="startCreate()">
-      <span>+</span>
-      Add Vehicle
+      Add vehicle
     </button>
   </header>
 
   <section class="summary-grid">
     <div class="summary-card">
-      <div class="summary-icon vehicle-icon">🚘</div>
       <div>
         <span>VEHICLES</span>
         <h2>{{ vehicles().length }}</h2>
@@ -24,7 +22,6 @@
     </div>
 
     <div class="summary-card">
-      <div class="summary-icon scan-icon">◷</div>
       <div>
         <span>TOTAL SCANS</span>
         <h2>{{ totalScans() }}</h2>
@@ -33,7 +30,6 @@
     </div>
 
     <div class="summary-card">
-      <div class="summary-icon clock-icon">⌁</div>
       <div>
         <span>LATEST SCAN</span>
         <h2 class="date-value">{{ latestScan() ? (latestScan() | date: 'dd.MM.yy') : '—' }}</h2>
@@ -51,7 +47,7 @@
           <p>Vehicle details are used to personalise scans, history and AI reports.</p>
         </div>
 
-        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">✕</button>
+        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">Close</button>
       </div>
 
       <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
@@ -118,7 +114,7 @@
       </div>
 
       <div class="search-field">
-        <span>⌕</span>
+        
         <input
           type="text"
           placeholder="Search make, model, VIN or plate..."
@@ -134,7 +130,6 @@
       <p class="state-message is-error">მანქანები ვერ ჩაიტვირთა. სცადე ხელახლა.</p>
     } @else if (!filtered().length) {
       <div class="empty-state">
-        <span>🚘</span>
         <h3>No vehicles yet</h3>
         <p>დაამატე პირველი მანქანა, რომ დაიწყო დიაგნოსტიკა.</p>
         <button type="button" class="primary-button" (click)="startCreate()">Add your first vehicle</button>
@@ -144,16 +139,14 @@
         @for (vehicle of filtered(); track vehicle.id) {
           <article class="vehicle-card">
             <div class="vehicle-card-top">
-              <div class="vehicle-icon">🚘</div>
-
               <div class="vehicle-title">
                 <h3>{{ vehicle.make }} {{ vehicle.model }}</h3>
                 <span>{{ vehicle.year }}</span>
               </div>
 
               <div class="vehicle-actions">
-                <button type="button" class="icon-button" (click)="startEdit(vehicle)" title="Edit">✎</button>
-                <button type="button" class="icon-button danger" (click)="remove(vehicle)" title="Delete">🗑</button>
+                <button type="button" class="text-button" (click)="startEdit(vehicle)">Edit</button>
+                <button type="button" class="text-button danger" (click)="remove(vehicle)">Delete</button>
               </div>
             </div>
 

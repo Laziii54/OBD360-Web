@@ -1,14 +1,14 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
 }
 
 .live-data-page {
@@ -55,9 +55,9 @@
   gap: 9px;
   padding: 10px 14px;
 
-  color: #e9b35c;
-  background: rgba(233, 179, 92, 0.08);
-  border: 1px solid rgba(233, 179, 92, 0.2);
+  color: #b9863f;
+  background: rgba(185, 134, 63, 0.08);
+  border: 1px solid rgba(185, 134, 63, 0.2);
   border-radius: 30px;
 
   font-size: 9px;
@@ -68,7 +68,7 @@
 .status-dot {
   width: 7px;
   height: 7px;
-  background: #e9b35c;
+  background: #b9863f;
   border-radius: 50%;
 }
 
@@ -163,7 +163,7 @@
 .pause-button {
   border: 1px solid var(--accent);
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.08);
+  background: rgba(63, 93, 78, 0.08);
 }
 
 .clear-button {
@@ -236,7 +236,7 @@ select:disabled {
   transition: 0.2s ease;
 
   &:hover {
-    border-color: rgba(49, 214, 155, 0.35);
+    border-color: rgba(63, 93, 78, 0.35);
     transform: translateY(-2px);
   }
 }
@@ -262,29 +262,29 @@ select:disabled {
 .rpm-icon,
 .load-icon {
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 }
 
 .speed-icon,
 .voltage-icon {
-  color: #64aaff;
-  background: rgba(100, 170, 255, 0.1);
+  color: #5b7a8c;
+  background: rgba(91, 122, 140, 0.1);
 }
 
 .temp-icon,
 .intake-icon {
-  color: #e9b35c;
-  background: rgba(233, 179, 92, 0.1);
+  color: #b9863f;
+  background: rgba(185, 134, 63, 0.1);
 }
 
 .throttle-icon,
 .fuel-icon {
-  color: #b69aff;
-  background: rgba(182, 154, 255, 0.1);
+  color: #7d7395;
+  background: rgba(125, 115, 149, 0.1);
 }
 
 .sensor-category {
-  color: #667184;
+  color: #8a8f85;
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.8px;
@@ -327,13 +327,13 @@ select:disabled {
   }
 
   span:first-child {
-    color: #667184;
+    color: #8a8f85;
     font-weight: 700;
   }
 }
 
 .waiting-label {
-  color: #e9b35c;
+  color: #b9863f;
 }
 
 // CHART SECTION
@@ -370,7 +370,7 @@ select:disabled {
   justify-content: space-between;
   padding: 8px 8px 28px 0;
 
-  color: #657184;
+  color: #8a8f85;
   font-size: 9px;
   text-align: right;
 }
@@ -391,7 +391,7 @@ select:disabled {
   div {
     width: 100%;
     height: 1px;
-    border-top: 1px dashed #293442;
+    border-top: 1px dashed #e4e0d7;
   }
 }
 
@@ -501,8 +501,8 @@ select:disabled {
   display: inline-flex;
   padding: 5px 8px;
 
-  color: #e9b35c;
-  background: rgba(233, 179, 92, 0.08);
+  color: #b9863f;
+  background: rgba(185, 134, 63, 0.08);
   border-radius: 5px;
 
   font-size: 9px;
@@ -597,7 +597,7 @@ select:disabled {
 
   polyline {
     fill: none;
-    stroke: #31d69b;
+    stroke: #3f5d4e;
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
   }

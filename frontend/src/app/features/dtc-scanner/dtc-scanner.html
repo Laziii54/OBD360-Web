@@ -14,7 +14,6 @@
     </div>
   </div>
 
-
   <!-- VEHICLE CONNECTION -->
   <section class="vehicle-card">
 
@@ -41,7 +40,6 @@
 
   </section>
 
-
   <!-- SCAN CONTROL -->
   <section class="scan-control-card">
 
@@ -59,29 +57,25 @@
       <div class="scan-capabilities">
 
         <div>
-          <span>✓</span>
-          Stored DTC
+Stored DTC
         </div>
 
         <div>
-          <span>✓</span>
-          Pending DTC
+Pending DTC
         </div>
 
         <div>
-          <span>✓</span>
-          Permanent DTC
+Permanent DTC
         </div>
 
         <div>
-          <span>✓</span>
-          Vehicle Information
+Vehicle Information
         </div>
 
       </div>
 
       <button class="start-scan-button" type="button" [disabled]="!canScan()" (click)="scanner.scan()">
-        <span class="scan-button-icon">⌕</span>
+        <span class="scan-button-icon"></span>
         {{ scanner.scanning() ? 'Scanning...' : 'Start Full Diagnostic Scan' }}
       </button>
 
@@ -107,7 +101,6 @@
 
   </section>
 
-
   <!-- SCAN SUMMARY -->
   <section class="summary-section">
 
@@ -125,7 +118,6 @@
         }
       </span>
     </div>
-
 
     <div class="summary-grid">
 
@@ -147,7 +139,6 @@
 
       </div>
 
-
       <!-- PENDING -->
       <div class="summary-card">
 
@@ -166,7 +157,6 @@
 
       </div>
 
-
       <!-- PERMANENT -->
       <div class="summary-card">
 
@@ -184,7 +174,6 @@
         </div>
 
       </div>
-
 
       <!-- ECU -->
       <div class="summary-card">
@@ -207,7 +196,6 @@
     </div>
 
   </section>
-
 
   <!-- DTC RESULTS -->
   <section class="results-section">
@@ -238,7 +226,6 @@
 
     </div>
 
-
     <!-- TABS -->
     <div class="dtc-tabs">
 
@@ -255,7 +242,6 @@
       }
 
     </div>
-
 
     <!-- EMPTY STATE -->
     @for (finding of findings(); track finding.code) {
@@ -298,7 +284,6 @@
 
   </section>
 
-
   <!-- READINESS MONITORS -->
   <section class="readiness-section">
 
@@ -312,7 +297,6 @@
       <span class="readiness-status">{{ scanner.vehicleStatus() ? 'AVAILABLE' : 'NOT AVAILABLE' }}</span>
 
     </div>
-
 
     <div class="readiness-grid">
       @for (monitor of scanner.vehicleStatus()?.monitors ?? []; track monitor.name) {
@@ -331,7 +315,6 @@
 
   </section>
 
-
   <!-- LAST SCAN INFORMATION -->
   <section class="last-scan-card">
 
@@ -348,7 +331,6 @@
     </div>
 
   </section>
-
 
   <!-- FOOTER -->
   <div class="dtc-footer">

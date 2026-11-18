@@ -1,9 +1,9 @@
-$accent: #2563eb;
-$accent-hover: #1d4ed8;
-$ink: #111827;
-$muted: #6b7280;
-$line: #d1d5db;
-$danger: #dc2626;
+$accent: #3f5d4e;
+$accent-hover: #334c40;
+$ink: #20251f;
+$muted: #72776e;
+$line: #e4e0d7;
+$danger: #b3564d;
 
 :host {
   display: flex;
@@ -23,12 +23,27 @@ $danger: #dc2626;
   gap: 1.5rem;
   background: white;
   color: $ink;
+  border: 1px solid $line;
   border-radius: 16px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 24px 70px rgba(32, 37, 31, 0.08);
+
+  .auth-brand {
+    color: $muted;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-align: center;
+
+    span {
+      color: $accent;
+    }
+  }
 
   h1 {
     font-size: 1.75rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.04em;
     line-height: 1.2;
     text-align: center;
   }
@@ -52,7 +67,7 @@ $danger: #dc2626;
     padding: 0.75rem 0.9rem;
     border: 1px solid $line;
     border-radius: 10px;
-    background: #f9fafb;
+    background: #f7f5f0;
     color: $ink;
     font-size: 1rem;
     font-weight: 400;

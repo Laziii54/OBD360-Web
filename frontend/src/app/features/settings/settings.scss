@@ -1,14 +1,14 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
 }
 
 // MAIN PAGE
@@ -58,8 +58,8 @@
   padding: 10px 14px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.08);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.08);
+  border: 1px solid rgba(63, 93, 78, 0.2);
   border-radius: 30px;
 
   font-size: 10px;
@@ -72,7 +72,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px rgba(49, 214, 155, 0.5);
+  box-shadow: 0 0 8px rgba(63, 93, 78, 0.5);
 }
 
 // SETTINGS LAYOUT
@@ -103,7 +103,7 @@
 
 .settings-nav-heading {
   margin: 5px 8px 13px;
-  color: #667184;
+  color: #8a8f85;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -133,7 +133,7 @@
 
   &.active {
     color: var(--accent);
-    background: rgba(49, 214, 155, 0.1);
+    background: rgba(63, 93, 78, 0.1);
   }
 }
 
@@ -204,8 +204,8 @@
   justify-content: center;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
-  border: 1px solid rgba(49, 214, 155, 0.15);
+  background: rgba(63, 93, 78, 0.1);
+  border: 1px solid rgba(63, 93, 78, 0.15);
   border-radius: 9px;
 
   font-size: 18px;
@@ -234,7 +234,7 @@
   justify-content: center;
 
   color: var(--accent);
-  background: #253b38;
+  background: #e7ede8;
   border-radius: 50%;
 
   font-size: 19px;
@@ -261,7 +261,7 @@
   padding: 6px 9px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
   border-radius: 5px;
 
   font-size: 9px;
@@ -287,7 +287,7 @@
   }
 
   label {
-    color: #dbe3ed;
+    color: #2b302a;
     font-size: 11px;
     font-weight: 700;
   }
@@ -311,11 +311,11 @@
 
     &:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(49, 214, 155, 0.08);
+      box-shadow: 0 0 0 3px rgba(63, 93, 78, 0.08);
     }
 
     &::placeholder {
-      color: #657184;
+      color: #8a8f85;
     }
   }
 
@@ -323,8 +323,8 @@
     cursor: pointer;
 
     option {
-      background: #192330;
-      color: #f1f5f9;
+      background: #f3f1eb;
+      color: #20251f;
     }
   }
 }
@@ -388,7 +388,7 @@
     position: absolute;
     inset: 0;
 
-    background: #344052;
+    background: #e4e0d7;
     border-radius: 30px;
 
     cursor: pointer;
@@ -446,13 +446,13 @@
 }
 
 .primary-button {
-  color: #071710;
+  color: #ffffff;
   background: var(--accent);
   border: 1px solid var(--accent);
 
   &:hover {
-    background: #4be5ae;
-    border-color: #4be5ae;
+    background: #557566;
+    border-color: #557566;
   }
 }
 
@@ -537,13 +537,13 @@
   border-radius: 9px;
 
   &.is-online {
-    border-color: rgba(49, 214, 155, 0.3);
-    background: rgba(49, 214, 155, 0.07);
+    border-color: rgba(63, 93, 78, 0.3);
+    background: rgba(63, 93, 78, 0.07);
   }
 
   &.is-offline {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.07);
+    border-color: rgba(179, 86, 77, 0.3);
+    background: rgba(179, 86, 77, 0.07);
   }
 
   .secondary-button {
@@ -557,17 +557,17 @@
   min-width: 10px;
 
   border-radius: 50%;
-  background: #667184;
+  background: #8a8f85;
   box-shadow: 0 0 10px rgba(102, 113, 132, 0.5);
 
   .integration-summary.is-online & {
     background: var(--accent);
-    box-shadow: 0 0 10px rgba(49, 214, 155, 0.6);
+    box-shadow: 0 0 10px rgba(63, 93, 78, 0.6);
   }
 
   .integration-summary.is-offline & {
-    background: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    background: #b3564d;
+    box-shadow: 0 0 10px rgba(179, 86, 77, 0.6);
   }
 }
 
@@ -590,8 +590,8 @@
 .integration-badge {
   padding: 6px 9px;
 
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  color: #b3564d;
+  background: rgba(179, 86, 77, 0.1);
   border-radius: 5px;
 
   font-size: 9px;
@@ -600,13 +600,13 @@
 
   &.is-ready {
     color: var(--accent);
-    background: rgba(49, 214, 155, 0.1);
+    background: rgba(63, 93, 78, 0.1);
   }
 }
 
 .option-information code,
 .field-description code {
-  color: #cbd5e1;
+  color: #3e443d;
   font-size: 10px;
 }
 

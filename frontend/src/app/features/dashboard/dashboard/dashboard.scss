@@ -1,14 +1,14 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
 }
 
 // MAIN DASHBOARD
@@ -68,8 +68,8 @@ a:hover{
   padding: 10px 14px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.08);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.08);
+  border: 1px solid rgba(63, 93, 78, 0.2);
   border-radius: 30px;
 
   font-size: 10px;
@@ -82,7 +82,7 @@ a:hover{
   height: 7px;
   background: var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(49, 214, 155, 0.5);
+  box-shadow: 0 0 8px rgba(63, 93, 78, 0.5);
 }
 
 // VEHICLE OVERVIEW
@@ -98,11 +98,11 @@ a:hover{
   background:
     linear-gradient(
       110deg,
-      rgba(49, 214, 155, 0.09),
-      rgba(18, 25, 35, 0.98) 65%
+      rgba(63, 93, 78, 0.09),
+      rgba(255, 255, 255, 0.98) 65%
     );
 
-  border: 1px solid rgba(49, 214, 155, 0.18);
+  border: 1px solid rgba(63, 93, 78, 0.18);
   border-radius: 13px;
 }
 
@@ -122,8 +122,8 @@ a:hover{
   align-items: center;
   justify-content: center;
 
-  background: rgba(49, 214, 155, 0.1);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.1);
+  border: 1px solid rgba(63, 93, 78, 0.2);
   border-radius: 12px;
 
   font-size: 29px;
@@ -171,7 +171,7 @@ a:hover{
     height: 9px;
     min-width: 9px;
 
-    background: #ef6262;
+    background: #b3564d;
     border-radius: 50%;
   }
 
@@ -182,7 +182,7 @@ a:hover{
   }
 
   strong {
-    color: #ef7777;
+    color: #c06b62;
     font-size: 11px;
   }
 
@@ -236,7 +236,7 @@ a:hover{
   transition: 0.2s ease;
 
   &:hover {
-    border-color: rgba(49, 214, 155, 0.35);
+    border-color: rgba(63, 93, 78, 0.35);
     transform: translateY(-2px);
   }
 }
@@ -264,7 +264,7 @@ a:hover{
   justify-content: center;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.09);
+  background: rgba(63, 93, 78, 0.09);
   border-radius: 7px;
 
   font-size: 15px;
@@ -296,7 +296,7 @@ a:hover{
   margin-top: 18px;
   overflow: hidden;
 
-  background: #263241;
+  background: #e4e0d7;
   border-radius: 5px;
 
   div {
@@ -330,7 +330,7 @@ a:hover{
   transition: 0.2s ease;
 
   &:hover {
-    border-color: #3a4859;
+    border-color: #cfcabf;
   }
 }
 
@@ -348,18 +348,18 @@ a:hover{
 }
 
 .warning-icon {
-  color: #f4b84e;
+  color: #b9863f;
   background: rgba(244, 184, 78, 0.1);
 }
 
 .ecu-icon {
-  color: #61a9ff;
+  color: #5b7a8c;
   background: rgba(97, 169, 255, 0.1);
 }
 
 .scan-icon {
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 }
 
 .diagnostic-information {
@@ -459,13 +459,13 @@ a:hover{
   justify-content: center;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.09);
+  background: rgba(63, 93, 78, 0.09);
   border-radius: 8px;
 
   font-size: 17px;
 }
 
-.tool-item > div:nth-child(2) {
+.tool-item > div {
   flex: 1;
   min-width: 0;
 
@@ -543,7 +543,7 @@ a:hover{
   border-top: 1px solid var(--border);
 
   span {
-    color: #657184;
+    color: #8a8f85;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.8px;

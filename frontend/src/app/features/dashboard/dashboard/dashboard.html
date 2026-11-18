@@ -14,17 +14,11 @@
     </div>
   </div>
 
-
   <!-- VEHICLE OVERVIEW -->
   <section class="vehicle-overview">
 
     <div class="vehicle-main">
-
-      <div class="vehicle-icon">
-        🚘
-      </div>
-
-      <div class="vehicle-information">
+<div class="vehicle-information">
         <span class="section-label">CURRENT VEHICLE</span>
         <h2>No vehicle selected</h2>
         <p>Add a vehicle to start your diagnostic session.</p>
@@ -42,7 +36,6 @@
 
   </section>
 
-
   <!-- LIVE DATA SECTION -->
   <section class="dashboard-section">
 
@@ -55,7 +48,6 @@
       <span class="data-status">{{ adapter.isConnected() ? 'Live' : 'Waiting for connection' }}</span>
     </div>
 
-
     <div class="metrics-grid">
 
       <!-- RPM -->
@@ -63,8 +55,7 @@
 
         <div class="metric-top">
           <span class="metric-name">ENGINE RPM</span>
-          <span class="metric-icon">◉</span>
-        </div>
+</div>
 
         <div class="metric-value">
           {{ metric('rpm') }} <span>{{ unit('rpm') }}</span>
@@ -80,14 +71,12 @@
 
       </div>
 
-
       <!-- SPEED -->
       <div class="metric-card">
 
         <div class="metric-top">
           <span class="metric-name">VEHICLE SPEED</span>
-          <span class="metric-icon">➤</span>
-        </div>
+</div>
 
         <div class="metric-value">
           {{ metric('speed') }} <span>{{ unit('speed') }}</span>
@@ -103,14 +92,12 @@
 
       </div>
 
-
       <!-- COOLANT -->
       <div class="metric-card">
 
         <div class="metric-top">
           <span class="metric-name">COOLANT TEMPERATURE</span>
-          <span class="metric-icon">♨</span>
-        </div>
+</div>
 
         <div class="metric-value">
           {{ metric('coolant') }} <span>{{ unit('coolant') }}</span>
@@ -126,14 +113,12 @@
 
       </div>
 
-
       <!-- VOLTAGE -->
       <div class="metric-card">
 
         <div class="metric-top">
           <span class="metric-name">BATTERY VOLTAGE</span>
-          <span class="metric-icon">ϟ</span>
-        </div>
+</div>
 
         <div class="metric-value">
           {{ metric('voltage') }} <span>{{ unit('voltage') }}</span>
@@ -153,7 +138,6 @@
 
   </section>
 
-
   <!-- DIAGNOSTIC OVERVIEW -->
   <section class="dashboard-section">
 
@@ -164,17 +148,11 @@
       </div>
     </div>
 
-
     <div class="diagnostic-grid">
 
       <!-- DTC -->
       <div class="diagnostic-card">
-
-        <div class="diagnostic-icon warning-icon">
-          ⚠
-        </div>
-
-        <div class="diagnostic-information">
+<div class="diagnostic-information">
           <span>ACTIVE DTC CODES</span>
           <h3>{{ scanner.hasScanned() ? activeCodes() : '--' }}</h3>
           <p>{{ scanner.hasScanned() ? 'Codes from the latest scan' : 'Waiting for diagnostic scan' }}</p>
@@ -182,15 +160,9 @@
 
       </div>
 
-
       <!-- ECU -->
       <div class="diagnostic-card">
-
-        <div class="diagnostic-icon ecu-icon">
-          ▤
-        </div>
-
-        <div class="diagnostic-information">
+<div class="diagnostic-information">
           <span>ECU MODULES</span>
           <h3>{{ adapter.vehicleResponding() ? 'OK' : '--' }}</h3>
           <p>{{ adapter.vehicleResponding() ? 'Vehicle is responding' : 'Modules not scanned' }}</p>
@@ -198,15 +170,9 @@
 
       </div>
 
-
       <!-- SCANS -->
       <div class="diagnostic-card">
-
-        <div class="diagnostic-icon scan-icon">
-          ◷
-        </div>
-
-        <div class="diagnostic-information">
+<div class="diagnostic-information">
           <span>LAST SCAN</span>
           <h3>{{ scanner.scannedAt() ? (scanner.scannedAt() | date: 'HH:mm') : '--' }}</h3>
           <p>{{ scanner.scannedAt() ? 'Scanned in this session' : 'No previous scan available' }}</p>
@@ -218,10 +184,8 @@
 
   </section>
 
-
   <!-- BOTTOM GRID -->
   <div class="dashboard-bottom">
-
 
     <!-- QUICK ACCESS -->
     <section class="dashboard-panel">
@@ -236,43 +200,28 @@
       <div class="tool-list">
 
         <a class="tool-item" routerLink="/app/live-data">
-          <div class="tool-icon">⌁</div>
-
-          <div>
+<div>
             <h3>Live Data</h3>
             <p>Monitor vehicle sensors</p>
           </div>
-
-          <span class="tool-arrow">→</span>
-        </a>
-
+</a>
 
         <a class="tool-item" routerLink="/app/dtc-scanner">
-          <div class="tool-icon">⚠</div>
-
-          <div>
+<div>
             <h3>DTC Scanner</h3>
             <p>Read diagnostic trouble codes</p>
           </div>
-
-          <span class="tool-arrow">→</span>
-        </a>
-
+</a>
 
         <a class="tool-item" routerLink="/app/ecu-modules">
-          <div class="tool-icon">▤</div>
-
-          <div>
+<div>
             <h3>ECU Modules</h3>
             <p>Explore vehicle control modules</p>
           </div>
-
-          <span class="tool-arrow">→</span>
-        </a>
+</a>
       </div>
 
     </section>
-
 
     <!-- RECENT ACTIVITY -->
     <section class="dashboard-panel">
@@ -287,10 +236,7 @@
       </div>
 
       <div class="empty-activity">
-
-        <div class="activity-icon">◷</div>
-
-        <h3>No recent activity</h3>
+<h3>No recent activity</h3>
 
         <p>
           Your diagnostic sessions and vehicle
@@ -302,7 +248,6 @@
     </section>
 
   </div>
-
 
   <!-- FOOTER -->
   <div class="dashboard-footer">

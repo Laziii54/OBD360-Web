@@ -1,14 +1,14 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
 }
 
 
@@ -63,8 +63,8 @@
   padding: 10px 14px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.08);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.08);
+  border: 1px solid rgba(63, 93, 78, 0.2);
   border-radius: 30px;
 
   font-size: 9px;
@@ -104,7 +104,7 @@
   transition: 0.2s ease;
 
   &:hover {
-    border-color: #3a4859;
+    border-color: #cfcabf;
     transform: translateY(-2px);
   }
 
@@ -149,23 +149,23 @@
 }
 
 .total-icon {
-  color: #64aaff;
-  background: rgba(100, 170, 255, 0.1);
+  color: #5b7a8c;
+  background: rgba(91, 122, 140, 0.1);
 }
 
 .success-icon {
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 }
 
 .error-icon {
-  color: #f07474;
+  color: #c06b62;
   background: rgba(240, 116, 116, 0.1);
 }
 
 .vehicle-icon {
-  color: #b69aff;
-  background: rgba(182, 154, 255, 0.1);
+  color: #7d7395;
+  background: rgba(125, 115, 149, 0.1);
 }
 
 
@@ -213,8 +213,8 @@
   padding: 0 14px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.08);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.08);
+  border: 1px solid rgba(63, 93, 78, 0.2);
   border-radius: 7px;
 
   font-size: 10px;
@@ -260,7 +260,7 @@
   }
 
   input::placeholder {
-    color: #738094;
+    color: #8a8f85;
   }
 }
 
@@ -450,7 +450,7 @@
   transition: 0.2s ease;
 
   &:hover {
-    border-color: #3a4859;
+    border-color: #cfcabf;
   }
 
   h3 {
@@ -481,16 +481,16 @@
 
 .scan-icon {
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 }
 
 .vehicle-activity-icon {
-  background: rgba(100, 170, 255, 0.1);
+  background: rgba(91, 122, 140, 0.1);
 }
 
 .time-icon {
-  color: #b69aff;
-  background: rgba(182, 154, 255, 0.1);
+  color: #7d7395;
+  background: rgba(125, 115, 149, 0.1);
 }
 
 
@@ -503,8 +503,8 @@
 
   padding: 18px;
 
-  background: rgba(100, 170, 255, 0.05);
-  border: 1px solid rgba(100, 170, 255, 0.16);
+  background: rgba(91, 122, 140, 0.05);
+  border: 1px solid rgba(91, 122, 140, 0.16);
   border-radius: 9px;
 
   .notice-icon {
@@ -516,8 +516,8 @@
     align-items: center;
     justify-content: center;
 
-    color: #64aaff;
-    background: rgba(100, 170, 255, 0.1);
+    color: #5b7a8c;
+    background: rgba(91, 122, 140, 0.1);
     border-radius: 7px;
 
     font-size: 17px;
@@ -550,7 +550,7 @@
   border-top: 1px solid var(--border);
 
   span {
-    color: #657184;
+    color: #8a8f85;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.8px;

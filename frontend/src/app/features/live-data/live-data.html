@@ -44,7 +44,7 @@
       </div>
 
       <button class="pause-button" type="button" [disabled]="!adapter.isConnected()" (click)="togglePause()">
-        {{ live.paused() ? '▶ Resume' : '▌▌ Pause' }}
+        {{ live.paused() ? 'Resume' : 'Pause' }}
       </button>
 
       <button class="clear-button" type="button" [disabled]="!live.hasData()" (click)="live.clear()">

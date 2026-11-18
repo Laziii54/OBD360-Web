@@ -1,14 +1,14 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
 }
 
 // MAIN PAGE
@@ -61,7 +61,7 @@
   background: rgba(239, 98, 98, 0.08);
   border-radius: 30px;
 
-  color: #ef7777;
+  color: #c06b62;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
@@ -69,7 +69,7 @@
   .status-dot {
     width: 7px;
     height: 7px;
-    background: #ef6262;
+    background: #b3564d;
     border-radius: 50%;
   }
 }
@@ -82,14 +82,14 @@
   gap: 22px;
 
   padding: 27px;
-  border: 1px solid rgba(49, 214, 155, 0.18);
+  border: 1px solid rgba(63, 93, 78, 0.18);
   border-radius: 14px;
 
   background:
     linear-gradient(
       110deg,
-      rgba(49, 214, 155, 0.09),
-      rgba(18, 25, 35, 0.95) 65%
+      rgba(63, 93, 78, 0.09),
+      rgba(255, 255, 255, 0.95) 65%
     );
 }
 
@@ -103,8 +103,8 @@
   justify-content: center;
 
   border-radius: 14px;
-  background: rgba(49, 214, 155, 0.12);
-  border: 1px solid rgba(49, 214, 155, 0.2);
+  background: rgba(63, 93, 78, 0.12);
+  border: 1px solid rgba(63, 93, 78, 0.2);
 
   color: var(--accent);
   font-size: 31px;
@@ -211,7 +211,7 @@
   justify-content: center;
 
   border-radius: 10px;
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 
   color: var(--accent);
   font-size: 28px;
@@ -251,7 +251,7 @@
   border-radius: 8px;
 
   background: var(--accent);
-  color: #071710;
+  color: #ffffff;
 
   font-size: 12px;
   font-weight: 800;
@@ -263,8 +263,8 @@
   }
 
   &:hover {
-    background: #4be5ae;
-    border-color: #4be5ae;
+    background: #557566;
+    border-color: #557566;
   }
 
   &:active {
@@ -388,7 +388,7 @@
   transition: 0.2s ease;
 
   &:hover {
-    border-color: rgba(49, 214, 155, 0.4);
+    border-color: rgba(63, 93, 78, 0.4);
     transform: translateY(-3px);
   }
 
@@ -471,10 +471,10 @@
 }
 
 .connection-badge.is-connected {
-  color: #31d69b;
+  color: #3f5d4e;
 
   .status-dot {
-    background: #31d69b;
+    background: #3f5d4e;
   }
 }
 
@@ -485,7 +485,7 @@
 
 .adapter-error {
   margin-top: 12px;
-  color: #ef4444;
+  color: #b3564d;
   font-size: 13px;
 }
 
@@ -495,8 +495,8 @@
   padding: 12px;
   overflow: auto;
   border-radius: 8px;
-  background: #0b0e13;
-  color: #8995a5;
+  background: #f6f5f1;
+  color: #72776e;
   font-size: 12px;
   line-height: 1.5;
   white-space: pre-wrap;

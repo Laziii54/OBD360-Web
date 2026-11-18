@@ -8,14 +8,12 @@
     </div>
 
     <button type="button" class="add-button" (click)="startCreate()">
-      <span>+</span>
-      Add Reminder
+      Add reminder
     </button>
   </header>
 
   <section class="summary-grid">
     <div class="summary-card">
-      <div class="summary-icon pending-icon">◷</div>
       <div>
         <span>PENDING</span>
         <h2>{{ pending() }}</h2>
@@ -24,7 +22,6 @@
     </div>
 
     <div class="summary-card">
-      <div class="summary-icon overdue-icon">⚠</div>
       <div>
         <span>OVERDUE</span>
         <h2>{{ overdue() }}</h2>
@@ -33,7 +30,6 @@
     </div>
 
     <div class="summary-card">
-      <div class="summary-icon done-icon">✓</div>
       <div>
         <span>COMPLETED</span>
         <h2>{{ done() }}</h2>
@@ -51,7 +47,7 @@
           <p>Choose a vehicle, service type and a due date or mileage.</p>
         </div>
 
-        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">✕</button>
+        <button type="button" class="close-button" (click)="cancel()" aria-label="Close">Close</button>
       </div>
 
       <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
@@ -148,7 +144,6 @@
       <p class="state-message is-error">შეხსენებები ვერ ჩაიტვირთა. სცადე ხელახლა.</p>
     } @else if (!reminders().length) {
       <div class="empty-state">
-        <span>◷</span>
         <h3>No reminders yet</h3>
         <p>დაამატე პირველი შეხსენება, რომ არ გამოტოვო მომსახურება.</p>
         <button type="button" class="primary-button" (click)="startCreate()">Add your first reminder</button>
@@ -189,8 +184,8 @@
               @if (reminder.status !== 'done') {
                 <button type="button" class="complete-button" (click)="complete(reminder)">Complete</button>
               }
-              <button type="button" class="icon-button" (click)="startEdit(reminder)" title="Edit">✎</button>
-              <button type="button" class="icon-button danger" (click)="remove(reminder)" title="Delete">🗑</button>
+              <button type="button" class="text-button" (click)="startEdit(reminder)">Edit</button>
+              <button type="button" class="text-button danger" (click)="remove(reminder)">Delete</button>
             </div>
           </article>
         }

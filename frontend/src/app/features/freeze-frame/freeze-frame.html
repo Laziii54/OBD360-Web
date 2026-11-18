@@ -58,7 +58,7 @@
         [disabled]="!adapter.isConnected() || reading()"
         (click)="read()"
       >
-        ◈ {{ reading() ? 'Reading...' : 'Read Freeze Frame' }}
+        {{ reading() ? 'Reading...' : 'Read Freeze Frame' }}
       </button>
 
     </div>

@@ -17,7 +17,6 @@
     </div>
   </div>
 
-
   <!-- VEHICLE OVERVIEW -->
   <section class="vehicle-card">
 
@@ -34,7 +33,7 @@
     </div>
 
     <div class="adapter-indicator">
-      <span></span>
+      
       <div>
         <strong>{{ adapter.adapterName() ?? 'Adapter Disconnected' }}</strong>
         <small>{{ adapter.protocol() ?? 'Waiting for connection' }}</small>
@@ -42,7 +41,6 @@
     </div>
 
   </section>
-
 
   <!-- MODULE SCANNER CONTROL -->
   <section class="module-scanner">
@@ -61,23 +59,19 @@
       <div class="scanner-features">
 
         <div>
-          <span>✓</span>
-          Module Discovery
+Module Discovery
         </div>
 
         <div>
-          <span>✓</span>
-          ECU Identification
+ECU Identification
         </div>
 
         <div>
-          <span>✓</span>
-          Module DTC Detection
+Module DTC Detection
         </div>
 
         <div>
-          <span>✓</span>
-          Communication Status
+Communication Status
         </div>
 
       </div>
@@ -88,7 +82,7 @@
         [disabled]="!adapter.isConnected() || scanning()"
         (click)="scan()"
       >
-        <span>⌕</span>
+        
         {{ scanning() ? 'Scanning...' : 'Start Module Scan' }}
       </button>
 
@@ -113,7 +107,6 @@
 
   </section>
 
-
   <!-- MODULE SUMMARY -->
   <section class="summary-section">
 
@@ -125,7 +118,6 @@
 
       <span class="summary-badge">{{ summaryLabel() }}</span>
     </div>
-
 
     <div class="summary-grid">
 
@@ -141,7 +133,6 @@
 
       </div>
 
-
       <div class="summary-card">
 
         <div class="summary-icon online-icon">◉</div>
@@ -154,7 +145,6 @@
 
       </div>
 
-
       <div class="summary-card">
 
         <div class="summary-icon error-icon">⚠</div>
@@ -166,7 +156,6 @@
         </div>
 
       </div>
-
 
       <div class="summary-card">
 
@@ -184,7 +173,6 @@
 
   </section>
 
-
   <!-- MODULE CATEGORIES -->
   <section class="modules-section">
 
@@ -196,7 +184,6 @@
       </div>
 
     </div>
-
 
     <div class="modules-grid">
       @for (module of modules(); track module.address) {
@@ -230,7 +217,6 @@
 
   </section>
 
-
   <!-- IMPORTANT INFORMATION -->
   <section class="module-notice">
 
@@ -248,7 +234,6 @@
     </div>
 
   </section>
-
 
   <!-- FOOTER -->
   <div class="ecu-footer">

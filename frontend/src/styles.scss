@@ -1,3 +1,34 @@
+/* GLOBAL DESIGN TOKENS */
+
+:root {
+  --font-sans: 'Noto Sans Georgian', 'Manrope', 'Segoe UI', sans-serif;
+  --font-display: 'Manrope', 'Noto Sans Georgian', 'Segoe UI', sans-serif;
+
+  --bg: #f6f5f1;
+  --bg-soft: #f1efe9;
+  --surface: #ffffff;
+  --surface-2: #f3f1eb;
+  --line: #e4e0d7;
+  --line-strong: #d6d1c6;
+
+  --ink: #20251f;
+  --ink-2: #3e443d;
+  --muted: #72776e;
+  --muted-2: #8a8f85;
+
+  --accent: #3f5d4e;
+  --accent-hover: #334c40;
+  --accent-soft: #e9efe9;
+  --danger: #b3564d;
+  --warning: #b9863f;
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 2px rgba(32, 37, 31, 0.04);
+  --shadow-md: 0 12px 36px rgba(32, 37, 31, 0.06);
+}
+
 /* GLOBAL RESET */
 
 *,
@@ -8,18 +39,52 @@
   box-sizing: border-box;
 }
 
-/* HTML & BODY */
-
 html,
 body {
   width: 100%;
   min-height: 100%;
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
-  background: #0b0e13;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 520px at 100% -10%, #eef2ed 0%, transparent 62%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* TYPOGRAPHY */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+p {
+  color: var(--muted);
+}
+
+::selection {
+  color: var(--ink);
+  background: #dfe7df;
 }
 
 /* COMMON ELEMENTS */
@@ -35,8 +100,113 @@ button {
   cursor: pointer;
 }
 
+a {
+  color: inherit;
+}
+
 img,
 svg {
   display: block;
   max-width: 100%;
 }
+
+/* ICON-FREE INTERFACE */
+
+.nav-icon,
+.logo-icon,
+.summary-icon,
+.metric-icon,
+.diagnostic-icon,
+.tool-icon,
+.activity-icon,
+.vehicle-icon,
+.card-icon,
+.settings-icon,
+.empty-icon,
+.notice-icon,
+.overview-icon,
+.search-icon,
+.scan-button-icon,
+.empty-results-icon,
+.last-scan-icon,
+.module-icon,
+.info-icon,
+.fault-icon,
+.empty-frame-icon,
+.chart-empty-icon,
+.tool-arrow,
+.sensor-icon,
+.scan-illustration,
+.scanner-graphic {
+  display: none !important;
+}
+
+.scan-control-content,
+.scanner-content {
+  width: 100%;
+  max-width: 780px !important;
+}
+
+.scan-control-card,
+.module-scanner {
+  justify-content: center !important;
+  min-height: auto !important;
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+.scan-control-card::before,
+.module-scanner::before {
+  display: none !important;
+}
+
+.scan-capabilities div,
+.scanner-features div {
+  padding-left: 10px;
+  border-left: 1px solid var(--line-strong);
+}
+
+.sensor-card-top {
+  justify-content: flex-start !important;
+}
+
+/* REFINED CONTROLS */
+
+input,
+select,
+textarea {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-2);
+}
+
+button {
+  font-weight: 600;
+}
+
+/* SCROLLBARS */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d1c6;
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4beb1;
+}
+

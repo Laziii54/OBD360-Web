@@ -1,16 +1,16 @@
 :host {
   display: block;
   width: 100%;
-  color: #f1f5f9;
+  color: #20251f;
 
-  --bg-card: #121923;
-  --bg-secondary: #192330;
-  --border: #263241;
-  --text-primary: #f1f5f9;
-  --text-secondary: #8995a5;
-  --accent: #31d69b;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  --bg-card: #ffffff;
+  --bg-secondary: #f3f1eb;
+  --border: #e4e0d7;
+  --text-primary: #20251f;
+  --text-secondary: #72776e;
+  --accent: #3f5d4e;
+  --danger: #b3564d;
+  --warning: #b9863f;
 }
 
 .reminders-page {
@@ -62,7 +62,7 @@
   min-height: 40px;
   padding: 0 18px;
 
-  color: #071710;
+  color: #ffffff;
   background: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 8px;
@@ -74,8 +74,8 @@
   transition: 0.2s ease;
 
   &:hover {
-    background: #4be5ae;
-    border-color: #4be5ae;
+    background: #557566;
+    border-color: #557566;
   }
 
   &:disabled {
@@ -145,18 +145,18 @@
 }
 
 .pending-icon {
-  color: #60a5fa;
-  background: rgba(96, 165, 250, 0.1);
+  color: #5b7a8c;
+  background: rgba(91, 122, 140, 0.1);
 }
 
 .overdue-icon {
   color: var(--warning);
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(185, 134, 63, 0.1);
 }
 
 .done-icon {
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
+  background: rgba(63, 93, 78, 0.1);
 }
 
 // FORM
@@ -198,7 +198,7 @@
 }
 
 .close-button {
-  width: 30px;
+  padding: 0 10px;
   height: 30px;
 
   color: var(--text-secondary);
@@ -206,12 +206,13 @@
   border: 1px solid var(--border);
   border-radius: 7px;
 
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 700;
   cursor: pointer;
 
   &:hover {
     color: var(--text-primary);
-    border-color: #3a4859;
+    border-color: var(--line-strong);
   }
 }
 
@@ -227,7 +228,7 @@
   gap: 7px;
 
   span {
-    color: #dbe3ed;
+    color: #2b302a;
     font-size: 11px;
     font-weight: 700;
   }
@@ -249,7 +250,7 @@
 
     &:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(49, 214, 155, 0.08);
+      box-shadow: 0 0 0 3px rgba(63, 93, 78, 0.08);
     }
 
     &:disabled {
@@ -258,13 +259,13 @@
     }
 
     &::placeholder {
-      color: #657184;
+      color: #8a8f85;
     }
   }
 
   select option {
-    color: #f1f5f9;
-    background: #192330;
+    color: #20251f;
+    background: #f3f1eb;
   }
 
   small {
@@ -366,8 +367,8 @@
     &:hover,
     &.active {
       color: var(--accent);
-      border-color: rgba(49, 214, 155, 0.4);
-      background: rgba(49, 214, 155, 0.08);
+      border-color: rgba(63, 93, 78, 0.4);
+      background: rgba(63, 93, 78, 0.08);
     }
   }
 }
@@ -423,14 +424,14 @@
 
   padding: 14px 16px;
 
-  background: var(--bg-secondary);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 12px;
 
-  transition: 0.2s ease;
+  transition: 0.18s ease;
 
   &:hover {
-    border-color: #3a4859;
+    border-color: var(--line-strong);
   }
 
   &.is-done {
@@ -449,18 +450,18 @@
   letter-spacing: 0.8px;
 
   &.status-pending {
-    color: #60a5fa;
-    background: rgba(96, 165, 250, 0.12);
+    color: #5b7a8c;
+    background: rgba(91, 122, 140, 0.12);
   }
 
   &.status-overdue {
     color: var(--warning);
-    background: rgba(245, 158, 11, 0.12);
+    background: rgba(185, 134, 63, 0.12);
   }
 
   &.status-done {
     color: var(--accent);
-    background: rgba(49, 214, 155, 0.12);
+    background: rgba(63, 93, 78, 0.12);
   }
 }
 
@@ -492,7 +493,7 @@
   font-size: 10px;
 
   b {
-    color: #cbd5e1;
+    color: #3e443d;
     font-weight: 600;
   }
 }
@@ -507,8 +508,8 @@
   padding: 7px 10px;
 
   color: var(--accent);
-  background: rgba(49, 214, 155, 0.1);
-  border: 1px solid rgba(49, 214, 155, 0.3);
+  background: rgba(63, 93, 78, 0.1);
+  border: 1px solid rgba(63, 93, 78, 0.3);
   border-radius: 6px;
 
   font-size: 9px;
@@ -516,34 +517,30 @@
   cursor: pointer;
 
   &:hover {
-    background: rgba(49, 214, 155, 0.18);
+    background: rgba(63, 93, 78, 0.18);
   }
 }
 
-.icon-button {
-  width: 29px;
-  height: 29px;
+.text-button {
+  padding: 6px 8px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+  border: none;
   border-radius: 6px;
 
-  font-size: 12px;
-  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  transition: 0.16s ease;
 
   &:hover {
     color: var(--accent);
-    border-color: var(--accent);
+    background: var(--accent-soft);
   }
 
   &.danger:hover {
     color: var(--danger);
-    border-color: var(--danger);
+    background: #f8ecea;
   }
 }
 

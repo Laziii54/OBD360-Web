@@ -47,7 +47,7 @@
 
       <div class="search-area">
 
-        <div class="search-icon">⌕</div>
+        <div class="search-icon"></div>
 
         <div class="search-text">
           <h3>Search for OBD2 adapters</h3>
@@ -65,7 +65,7 @@
         [disabled]="adapter.isBusy() || !adapter.isSupported"
         (click)="toggleConnection()"
       >
-        <span>⌕</span>
+        
         {{ adapter.isConnected() ? 'Disconnect' : 'Search for Adapters' }}
       </button>
 
