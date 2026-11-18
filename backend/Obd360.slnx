@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Obd360.Api/Obd360.Api.csproj" />
+  <Project Path="Obd360.Core/Obd360.Core.csproj" />
+  <Project Path="Obd360.Infrastructure/Obd360.Infrastructure.csproj" />
+  <Project Path="Obd360.Tests/Obd360.Tests.csproj" />
+</Solution>
