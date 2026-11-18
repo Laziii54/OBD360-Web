@@ -50,19 +50,6 @@ export class Settings {
     return 'n8n პასუხობს და workflow-ები კონფიგურირებულია.';
   });
 
-  readonly statusLabel = computed(() => {
-    switch (this.saveState()) {
-      case 'saving':
-        return 'Saving...';
-      case 'saved':
-        return 'Settings saved';
-      case 'failed':
-        return 'Could not save settings';
-      default:
-        return 'Settings loaded';
-    }
-  });
-
   readonly userInitial = computed(() => {
     const first = [...(this.currentUser()?.displayName.trim() ?? '')][0] ?? 'U';
     return /[a-z]/.test(first) ? first.toUpperCase() : first;
@@ -75,10 +62,8 @@ export class Settings {
 
   setUnitSystem(value: string): void {
     this.settings.unitSystem.set(value as UnitSystem);
-  }
-
-  save(): void {
     this.saveState.set('saving');
+
     this.settings.saveUnitSystem().subscribe({
       next: () => this.saveState.set('saved'),
       error: () => this.saveState.set('failed'),

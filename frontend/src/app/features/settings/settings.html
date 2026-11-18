@@ -1,410 +1,109 @@
 <div class="settings-page">
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div>
-      <span class="page-breadcrumb">PREFERENCES / SETTINGS</span>
-      <h1>Settings</h1>
-      <p>Manage your account, application and diagnostic preferences.</p>
-    </div>
+  <header class="page-header">
+    <h1>Settings</h1>
+    <p>Manage your account and diagnostic preferences.</p>
+  </header>
 
-    <div class="settings-status">
-      <span class="status-dot"></span>
-      {{ statusLabel() }}
-    </div>
-  </div>
+  <div class="settings-content">
 
-
-  <!-- SETTINGS NAVIGATION -->
-  <div class="settings-layout">
-
-    <aside class="settings-sidebar">
-
-      <span class="settings-nav-heading">SETTINGS MENU</span>
-
-      <a href="#account" class="settings-nav-item active">
-        <span class="settings-icon">◉</span>
-        Account
-      </a>
-
-      <a href="#general" class="settings-nav-item">
-        <span class="settings-icon">⚙</span>
-        General
-      </a>
-
-      <a href="#diagnostics" class="settings-nav-item">
-        <span class="settings-icon">⌁</span>
-        Diagnostics
-      </a>
-
-      <a href="#integration" class="settings-nav-item">
-        <span class="settings-icon">⌘</span>
-        n8n Integration
-      </a>
-
-      <a href="#notifications" class="settings-nav-item">
-        <span class="settings-icon">♧</span>
-        Notifications
-      </a>
-
-      <a href="#privacy" class="settings-nav-item">
-        <span class="settings-icon">◇</span>
-        Privacy & Security
-      </a>
-
-    </aside>
-
-
-    <!-- SETTINGS CONTENT -->
-    <div class="settings-content">
-
-
-      <!-- ACCOUNT -->
-      <section class="settings-card" id="account">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">PERSONAL INFORMATION</span>
-            <h2>Account Information</h2>
-            <p>Manage your personal account details.</p>
-          </div>
-
-          <span class="card-icon">◉</span>
+    <section class="settings-card">
+      <div class="settings-card-header">
+        <div>
+          <h2>Account</h2>
+          <p>Your OBD360 profile.</p>
         </div>
-
-        <div class="account-profile">
-
-          <div class="account-avatar">{{ userInitial() }}</div>
-
-          <div class="account-details">
-            <h3>{{ currentUser()?.displayName }}</h3>
-            <p>Standard Account</p>
-          </div>
-
-          <span class="account-badge">ACTIVE</span>
-
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <div class="settings-field">
-          <label>Display Name</label>
-          <input type="text" readonly [value]="currentUser()?.displayName ?? ''">
-        </div>
-
-        <div class="settings-field">
-          <label>Email Address</label>
-          <input type="email" readonly [value]="currentUser()?.email ?? ''">
-        </div>
-
-      </section>
-
-
-      <!-- GENERAL -->
-      <section class="settings-card" id="general">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">APPLICATION PREFERENCES</span>
-            <h2>General Settings</h2>
-            <p>Customize how OBD360 looks and behaves.</p>
-          </div>
-
-          <span class="card-icon">⚙</span>
-        </div>
-
-        <div class="settings-field">
-          <label for="language">Application Language</label>
-
-          <select id="language" disabled>
-            <option value="en">English</option>
-            <option value="ka">ქართული</option>
-          </select>
-
-          <span class="field-description">
-            Select your preferred application language.
-          </span>
-        </div>
-
-        <div class="settings-field">
-          <label for="unit-system">Measurement System</label>
-
-          <select id="unit-system" (change)="setUnitSystem($any($event.target).value)">
-            <option value="metric" [selected]="settings.unitSystem() === 'metric'">Metric (km, °C, kPa)</option>
-            <option value="imperial" [selected]="settings.unitSystem() === 'imperial'">Imperial (mi, °F, PSI)</option>
-          </select>
-
-          <span class="field-description">
-            Units used for vehicle sensor measurements.
-          </span>
-        </div>
-
-        <div class="settings-field">
-          <label for="theme">Application Theme</label>
-
-          <select id="theme" disabled>
-            <option value="dark">Dark Theme</option>
-            <option value="light">Light Theme</option>
-            <option value="system">System Default</option>
-          </select>
-        </div>
-
-      </section>
-
-
-      <!-- DIAGNOSTICS -->
-      <section class="settings-card" id="diagnostics">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">VEHICLE DIAGNOSTICS</span>
-            <h2>Diagnostic Settings</h2>
-            <p>Configure your OBD2 diagnostic experience.</p>
-          </div>
-
-          <span class="card-icon">⌁</span>
-        </div>
-
-        <div class="settings-option">
-
-          <div class="option-information">
-            <h3>Automatic Adapter Reconnection</h3>
-            <p>
-              Automatically attempt to reconnect when an adapter
-              connection is interrupted.
-            </p>
-          </div>
-
-          <label class="toggle-switch">
-            <input type="checkbox" id="auto-reconnect" disabled>
-            <span class="toggle-slider"></span>
-          </label>
-
-        </div>
-
-        <div class="settings-option">
-
-          <div class="option-information">
-            <h3>Confirm DTC Clearing</h3>
-            <p>
-              Ask for confirmation before clearing diagnostic
-              trouble codes from the vehicle.
-            </p>
-          </div>
-
-          <label class="toggle-switch">
-            <input
-              type="checkbox"
-              id="confirm-clear"
-              [checked]="settings.confirmClear()"
-              (change)="settings.confirmClear.set($any($event.target).checked)"
-            >
-            <span class="toggle-slider"></span>
-          </label>
-
-        </div>
-
-        <div class="settings-field">
-          <label for="refresh-rate">Live Data Refresh Rate</label>
-
-          <select id="refresh-rate" (change)="settings.refreshMs.set(+$any($event.target).value)">
-            @for (rate of refreshRates; track rate) {
-              <option [value]="rate" [selected]="rate === settings.refreshMs()">{{ rate }} ms</option>
-            }
-          </select>
-
-          <span class="field-description">
-            Preferred interval for updating Live Data displays.
-            Actual speed depends on your adapter and vehicle.
-          </span>
-        </div>
-
-      </section>
-
-
-      <!-- N8N INTEGRATION -->
-      <section class="settings-card" id="integration">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">AUTOMATION</span>
-            <h2>n8n Integration</h2>
-            <p>AI ანგარიშები და ასისტენტის კითხვები n8n workflow-ების მეშვეობით სრულდება.</p>
-          </div>
-
-          <span class="card-icon">⌘</span>
-        </div>
-
-        <div
-          class="integration-summary"
-          [class.is-online]="integrationState() === 'online'"
-          [class.is-offline]="integrationState() === 'offline'"
-        >
-          <span class="integration-dot"></span>
-
-          <div class="integration-information">
-            <h3>{{ integrationLabel() }}</h3>
-            <p>{{ integrationDetail() }}</p>
-          </div>
-
-          <button type="button" class="secondary-button" (click)="checkIntegration()">
-            შემოწმება
-          </button>
-        </div>
-
-        <div class="settings-option">
-          <div class="option-information">
-            <h3>Scan report workflow</h3>
-            <p>ბოლო სკანირების ანგარიშს ამზადებს <code>/webhook/obd360/scan-report</code>.</p>
-          </div>
-
-          <span class="integration-badge" [class.is-ready]="integration()?.scanReportConfigured">
-            {{ integration()?.scanReportConfigured ? 'Configured' : 'Not configured' }}
-          </span>
-        </div>
-
-        <div class="settings-option">
-          <div class="option-information">
-            <h3>Assistant ask workflow</h3>
-            <p>შემდგომ კითხვებს პასუხობს <code>/webhook/obd360/ask</code> და ინახავს ისტორიას.</p>
-          </div>
-
-          <span class="integration-badge" [class.is-ready]="integration()?.askConfigured">
-            {{ integration()?.askConfigured ? 'Configured' : 'Not configured' }}
-          </span>
-        </div>
-
-        <div class="settings-field">
-          <label>Backend configuration</label>
-          <input type="text" readonly value="N8n:BaseUrl (appsettings / user secrets)">
-          <span class="field-description">
-            შეცვალე <code>N8n:BaseUrl</code> appsettings.Development.json-ში ან
-            <code>dotnet user-secrets</code>-ით. ინსტრუქცია: <code>n8n/README.md</code>.
-          </span>
-        </div>
-
-      </section>
-
-
-      <!-- NOTIFICATIONS -->
-      <section class="settings-card" id="notifications">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">ALERTS & UPDATES</span>
-            <h2>Notifications</h2>
-            <p>Choose which notifications you want to receive.</p>
-          </div>
-
-          <span class="card-icon">♧</span>
-        </div>
-
-        <div class="settings-option">
-
-          <div class="option-information">
-            <h3>Diagnostic Alerts</h3>
-            <p>Receive notifications about vehicle diagnostic issues.</p>
-          </div>
-
-          <label class="toggle-switch">
-            <input type="checkbox" disabled>
-            <span class="toggle-slider"></span>
-          </label>
-
-        </div>
-
-        <div class="settings-option">
-
-          <div class="option-information">
-            <h3>Maintenance Reminders</h3>
-            <p>Get reminders about upcoming vehicle maintenance.</p>
-          </div>
-
-          <label class="toggle-switch">
-            <input type="checkbox" disabled>
-            <span class="toggle-slider"></span>
-          </label>
-
-        </div>
-
-        <div class="settings-option">
-
-          <div class="option-information">
-            <h3>Application Updates</h3>
-            <p>Receive information about new OBD360 features.</p>
-          </div>
-
-          <label class="toggle-switch">
-            <input type="checkbox" disabled>
-            <span class="toggle-slider"></span>
-          </label>
-
-        </div>
-
-      </section>
-
-
-      <!-- PRIVACY -->
-      <section class="settings-card" id="privacy">
-
-        <div class="settings-card-header">
-          <div>
-            <span class="section-label">ACCOUNT PROTECTION</span>
-            <h2>Privacy & Security</h2>
-            <p>Manage your account security and personal data.</p>
-          </div>
-
-          <span class="card-icon">◇</span>
-        </div>
-
-        <div class="security-item">
-          <div>
-            <h3>Password</h3>
-            <p>Change your account password.</p>
-          </div>
-
-          <button type="button" class="secondary-button" disabled>
-            Change Password
-          </button>
-        </div>
-
-        <div class="security-item">
-          <div>
-            <h3>Active Sessions</h3>
-            <p>Manage your active account sessions.</p>
-          </div>
-
-          <button type="button" class="secondary-button" disabled>
-            View Sessions
-          </button>
-        </div>
-
-        <div class="security-item">
-          <div>
-            <h3>Account Data</h3>
-            <p>Manage your personal information and stored data.</p>
-          </div>
-
-          <button type="button" class="secondary-button" disabled>
-            Manage Data
-          </button>
-        </div>
-
-      </section>
-
-
-      <!-- SAVE SETTINGS -->
-      <div class="settings-footer">
-
-        <p>Disabled options are not available yet.</p>
-
-        <button type="button" class="primary-button save-button" (click)="save()">
-          Save Changes
-        </button>
-
       </div>
 
-    </div>
+      <div class="account-profile">
+        <div class="account-avatar">{{ userInitial() }}</div>
+
+        <div class="account-details">
+          <h3>{{ currentUser()?.displayName }}</h3>
+          <p>{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-card">
+      <div class="settings-card-header">
+        <div>
+          <h2>Preferences</h2>
+          <p>Measurements and diagnostic behaviour.</p>
+        </div>
+
+        @if (saveState() === 'saved') {
+          <span class="save-state">Saved</span>
+        } @else if (saveState() === 'failed') {
+          <span class="save-state is-error">Could not save</span>
+        }
+      </div>
+
+      <div class="settings-field">
+        <label for="unit-system">Measurement system</label>
+
+        <select id="unit-system" (change)="setUnitSystem($any($event.target).value)">
+          <option value="metric" [selected]="settings.unitSystem() === 'metric'">Metric (km, °C, kPa)</option>
+          <option value="imperial" [selected]="settings.unitSystem() === 'imperial'">Imperial (mi, °F, PSI)</option>
+        </select>
+
+        <span class="field-description">Units used across live data and scan history.</span>
+      </div>
+
+      <div class="settings-field">
+        <label for="refresh-rate">Live data refresh rate</label>
+
+        <select id="refresh-rate" (change)="settings.refreshMs.set(+$any($event.target).value)">
+          @for (rate of refreshRates; track rate) {
+            <option [value]="rate" [selected]="rate === settings.refreshMs()">{{ rate }} ms</option>
+          }
+        </select>
+
+        <span class="field-description">How often sensor values update.</span>
+      </div>
+
+      <div class="settings-option">
+        <div class="option-information">
+          <h3>Confirm before clearing DTCs</h3>
+          <p>Ask for confirmation before clearing diagnostic trouble codes.</p>
+        </div>
+
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            [checked]="settings.confirmClear()"
+            (change)="settings.confirmClear.set($any($event.target).checked)"
+          >
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="settings-card">
+      <div class="settings-card-header">
+        <div>
+          <h2>AI integration</h2>
+          <p>Status of the n8n workflows that power the assistant.</p>
+        </div>
+      </div>
+
+      <div
+        class="integration-summary"
+        [class.is-online]="integrationState() === 'online'"
+        [class.is-offline]="integrationState() === 'offline'"
+      >
+        <span class="integration-dot"></span>
+
+        <div class="integration-information">
+          <h3>{{ integrationLabel() }}</h3>
+          <p>{{ integrationDetail() }}</p>
+        </div>
+
+        <button type="button" class="secondary-button" (click)="checkIntegration()">
+          Check status
+        </button>
+      </div>
+    </section>
 
   </div>
 
