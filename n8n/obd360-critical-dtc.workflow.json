@@ -1,0 +1,100 @@
+{
+  "name": "OBD360 Critical DTC Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "obd360/critical-dtc",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1a2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Critical DTC Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [-300, 0],
+      "webhookId": "3d4e5f60-7182-493a-a4b5-c6d7e8f90123"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nconst codes = Array.isArray(body.codes) ? body.codes : [];\nconst vehicle = body.vehicle || body.vin || 'Unknown vehicle';\nconst lines = [\n  '🚨 OBD360 critical DTC alert',\n  `Vehicle: ${vehicle}`,\n  body.vin ? `VIN: ${body.vin}` : null,\n  `Codes: ${codes.length ? codes.join(', ') : 'none'}`,\n  body.scannedAt ? `Scanned: ${body.scannedAt}` : null\n].filter(Boolean);\nconst token = $env.OBD360_TELEGRAM_BOT_TOKEN || '';\nconst chatId = $env.OBD360_TELEGRAM_CHAT_ID || '';\nreturn [{ json: {\n  text: lines.join('\\n'),\n  chatId,\n  telegramUrl: token ? `https://api.telegram.org/bot${token}/sendMessage` : ''\n} }];"
+      },
+      "id": "c2b3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "name": "Format Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-80, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.telegramUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chatId, text: $json.text }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "d3c4e5f6-a7b8-4c9d-8e0f-1a2b3c4d5e6f",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [140, 0],
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { status: 'accepted' } }}",
+        "options": {}
+      },
+      "id": "e4d5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f70",
+      "name": "Acknowledge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [360, 0]
+    }
+  ],
+  "connections": {
+    "Critical DTC Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [
+          {
+            "node": "Acknowledge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,88 @@
+{
+  "name": "OBD360 Assistant Ask (Gemini)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "obd360/ask",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5eb062d4-9f58-4173-c265-b0d41e0f7d86",
+      "name": "Assistant Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [-300, 0],
+      "webhookId": "2c3d4e5f-6071-4829-93a4-b5c6d7e8f901"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: $json.body.prompt }] }], systemInstruction: { parts: [{ text: 'შენ ხარ OBD360-ის ავტომობილის დიაგნოსტიკის ასისტენტი. უპასუხე ქართულად, მარტივი და გასაგები ენით. დაეყრდენი მხოლოდ მოწოდებულ სკანირების მონაცემებს და არ მოიგონო ფაქტები. გაითვალისწინე საუბრის ისტორია და უპასუხე მხოლოდ ახალ კითხვას. უსაფრთხოების საკითხებზე ურჩიე კვალიფიციურ ხელოსანს.' }] }, generationConfig: { temperature: 0.4, maxOutputTokens: 4096 } }) }}",
+        "options": {
+          "timeout": 25000
+        }
+      },
+      "id": "70d284f6-b17a-4395-e487-d2f630219fa8",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "position": [0, 0],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iwSPt1CB1Zhao2Q5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { text: $json.candidates?.[0]?.content?.parts?.[0]?.text } }}",
+        "options": {}
+      },
+      "id": "92f4a618-d39c-45b7-a6a9-f418523b1cba",
+      "name": "Respond with Answer",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [300, 0]
+    }
+  ],
+  "connections": {
+    "Assistant Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini": {
+      "main": [
+        [
+          {
+            "node": "Respond with Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

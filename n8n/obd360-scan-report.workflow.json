@@ -1,0 +1,88 @@
+{
+  "name": "OBD360 Scan Report (Gemini)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "obd360/scan-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0f4b1c7a-3d2e-4a91-9c58-6b1f0d2a7e10",
+      "name": "Scan Report Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [-300, 0],
+      "webhookId": "1b2c3d4e-5f60-4718-8293-a4b5c6d7e8f9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ role: 'user', parts: [{ text: $json.body.prompt }] }], systemInstruction: { parts: [{ text: 'შენ ხარ OBD360-ის ავტომობილის დიაგნოსტიკის ასისტენტი. უპასუხე ქართულად, მარტივი და გასაგები ენით. დაეყრდენი მხოლოდ მოწოდებულ სკანირების მონაცემებს და არ მოიგონო ფაქტები. უსაფრთხოების საკითხებზე ურჩიე კვალიფიციურ ხელოსანს.' }] }, generationConfig: { temperature: 0.4, maxOutputTokens: 4096 } }) }}",
+        "options": {
+          "timeout": 25000
+        }
+      },
+      "id": "2b8d3fa1-6c25-4e40-9f32-8da1eb7c4a53",
+      "name": "Call Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "position": [0, 0],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iwSPt1CB1Zhao2Q5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { text: $json.candidates?.[0]?.content?.parts?.[0]?.text } }}",
+        "options": {}
+      },
+      "id": "4daf51c3-8e47-4062-b154-afc30d9e6c75",
+      "name": "Respond with Report",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [300, 0]
+    }
+  ],
+  "connections": {
+    "Scan Report Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini": {
+      "main": [
+        [
+          {
+            "node": "Respond with Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
