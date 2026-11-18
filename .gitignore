@@ -25,3 +25,7 @@ n8n-data/
 *.tmp
 *.bak
 *.bak_*
+
+# local scratch folders
+Claude outputs/
+New folder/
