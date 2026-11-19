@@ -37,6 +37,10 @@ export class MainLayout {
     this.currentUser()?.roles.includes('Admin') ? 'Administrator' : 'Standard Account'
   );
 
+  readonly isAdmin = computed(() =>
+    this.currentUser()?.roles.includes('Admin') ?? false
+  );
+
   logout(): void {
     this.auth.logout().subscribe(() => this.router.navigateByUrl('/login'));
   }

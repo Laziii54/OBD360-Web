@@ -1,0 +1,249 @@
+<div class="admin-page">
+
+  <header class="page-header">
+    <span class="page-label">ADMINISTRATION</span>
+    <h1>Admin</h1>
+    <p>Manage users, roles and diagnostic activity.</p>
+  </header>
+
+  @if (toast()) {
+    <div class="toast">{{ toast() }}</div>
+  }
+
+  <section class="summary-grid">
+    <div class="summary-card">
+      <span>USERS</span>
+      <h2>{{ users().length }}</h2>
+      <p>Registered accounts</p>
+    </div>
+
+    <div class="summary-card">
+      <span>VEHICLES</span>
+      <h2>{{ totalVehicles() }}</h2>
+      <p>Across all users</p>
+    </div>
+
+    <div class="summary-card">
+      <span>SCANS</span>
+      <h2>{{ totalScans() }}</h2>
+      <p>Diagnostic sessions</p>
+    </div>
+
+    <div class="summary-card">
+      <span>DTC CODES</span>
+      <h2>{{ dtcCodeCount }}</h2>
+      <p>Catalog entries</p>
+    </div>
+  </section>
+
+  <nav class="admin-tabs">
+    <button type="button" [class.active]="tab() === 'overview'" (click)="setTab('overview')">
+      Overview
+    </button>
+    <button type="button" [class.active]="tab() === 'users'" (click)="setTab('users')">
+      Users
+    </button>
+    <button type="button" [class.active]="tab() === 'scans'" (click)="setTab('scans')">
+      Scan History
+    </button>
+  </nav>
+
+  @if (tab() === 'overview') {
+    <div class="overview-grid">
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <span class="section-label">RECENT ACCOUNTS</span>
+            <h2>New users</h2>
+          </div>
+          <button type="button" class="text-button" (click)="setTab('users')">View all</button>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of recentUsers(); track user.id) {
+                <tr>
+                  <td>
+                    <strong>{{ user.name }}</strong>
+                    <small>{{ user.email }}</small>
+                  </td>
+                  <td><span class="badge" [class.admin]="user.role === 'Admin'">{{ user.role }}</span></td>
+                  <td>{{ user.joinedAt | date: 'dd.MM.yyyy' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <span class="section-label">RECENT ACTIVITY</span>
+            <h2>Latest scans</h2>
+          </div>
+          <button type="button" class="text-button" (click)="setTab('scans')">View all</button>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>Codes</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (scan of recentScans(); track scan.id) {
+                <tr>
+                  <td><strong>{{ scan.vehicle }}</strong></td>
+                  <td>{{ scan.user }}</td>
+                  <td>{{ scan.scannedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                  <td>
+                    @if (scan.codes.length) {
+                      <span class="code-list">{{ scan.codes.join(', ') }}</span>
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  } @else if (tab() === 'users') {
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <span class="section-label">ACCOUNT MANAGEMENT</span>
+          <h2>Users</h2>
+          <p>{{ filteredUsers().length }} of {{ users().length }} accounts</p>
+        </div>
+
+        <div class="search-field">
+          <input
+            type="text"
+            placeholder="Search name, email or role..."
+            [value]="userSearch()"
+            (input)="userSearch.set($any($event.target).value)"
+          >
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Vehicles</th>
+              <th>Scans</th>
+              <th>Joined</th>
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr>
+                <td><strong>{{ user.name }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td><span class="badge" [class.admin]="user.role === 'Admin'">{{ user.role }}</span></td>
+                <td>{{ user.vehicles }}</td>
+                <td>{{ user.scans }}</td>
+                <td>{{ user.joinedAt | date: 'dd.MM.yyyy' }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button type="button" class="text-button" (click)="toggleRole(user)">
+                      {{ user.role === 'Admin' ? 'Make user' : 'Make admin' }}
+                    </button>
+                    <button type="button" class="text-button danger" (click)="deleteUser(user)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-cell">No users match this search.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  } @else {
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <span class="section-label">DIAGNOSTIC ACTIVITY</span>
+          <h2>Scan History</h2>
+          <p>{{ filteredScans().length }} of {{ scans().length }} sessions</p>
+        </div>
+
+        <div class="search-field">
+          <input
+            type="text"
+            placeholder="Search user, VIN, vehicle or DTC..."
+            [value]="scanSearch()"
+            (input)="scanSearch.set($any($event.target).value)"
+          >
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>User</th>
+              <th>Vehicle</th>
+              <th>VIN</th>
+              <th>DTC codes</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (scan of filteredScans(); track scan.id) {
+              <tr>
+                <td>{{ scan.scannedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                <td>{{ scan.user }}</td>
+                <td><strong>{{ scan.vehicle }}</strong></td>
+                <td class="mono">{{ scan.vin }}</td>
+                <td>
+                  @if (scan.codes.length) {
+                    <span class="code-list">{{ scan.codes.join(', ') }}</span>
+                  } @else {
+                    <span class="muted">No codes</span>
+                  }
+                </td>
+                <td>
+                  <span class="badge" [class.failed]="scan.status === 'Failed'">{{ scan.status }}</span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-cell">No scans match this search.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+</div>

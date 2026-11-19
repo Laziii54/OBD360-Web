@@ -81,6 +81,14 @@
         <span>Settings</span>
       </a>
 
+      @if (isAdmin()) {
+        <span class="nav-heading">ADMINISTRATION</span>
+
+        <a routerLink="/app/admin" routerLinkActive="active">
+          <span>Admin</span>
+        </a>
+      }
+
     </nav>
 
     <!-- SIDEBAR FOOTER -->
