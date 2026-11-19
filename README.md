@@ -115,6 +115,56 @@ $env:OBD360_TELEGRAM_CHAT_ID = "123456789"
 Bot token: `@BotFather` → `/newbot`. Chat ID: `@userinfobot` ან `getUpdates`.
 თუ env ცვლადები არ არის დაყენებული, workflow იღებს მოთხოვნას, მაგრამ Telegram-ში არ აგზავნის.
 
+## პაროლის აღდგენა
+
+მომხმარებელი ჰკითხულობს ელფოსტას, იღებს ერთჯერად ბმულს და აყენებს ახალ პაროლს.
+
+```text
+POST /api/v1/auth/forgot-password   { email }
+POST /api/v1/auth/reset-password    { email, token, newPassword }
+POST /api/v1/auth/change-password   { currentPassword, newPassword }  (ავტორიზებული)
+```
+
+უსაფრთხოება:
+
+- ბმული მოქმედებს **1 საათი** და მხოლოდ **ერთხელ**.
+- არ არსებობს user enumeration — უცნობ ელფოსტაზეც იგივე პასუხი ბრუნდება.
+- პაროლის შეცვლის/აღდგენის შემდეგ ყველა refresh session უქმდება.
+
+### SMTP კონფიგურაცია
+
+`appsettings.json`-ში ან environment variables-ით:
+
+```json
+"Smtp": {
+  "Host": "smtp.gmail.com",
+  "Port": 587,
+  "UserName": "your@gmail.com",
+  "Password": "APP_PASSWORD",
+  "FromAddress": "your@gmail.com",
+  "FromName": "OBD360",
+  "EnableSsl": true
+},
+"App": {
+  "FrontendBaseUrl": "http://localhost:4200"
+}
+```
+
+ან environment variables:
+
+```powershell
+$env:Smtp__Host = "smtp.gmail.com"
+$env:Smtp__Port = "587"
+$env:Smtp__UserName = "your@gmail.com"
+$env:Smtp__Password = "APP_PASSWORD"
+$env:Smtp__FromAddress = "your@gmail.com"
+$env:App__FrontendBaseUrl = "http://localhost:4200"
+```
+
+Gmail-ისთვის გამოიყენე **App Password**, არა ჩვეულებრივი პაროლი.
+SMTP-ის გარეშე (Development) API ბმულს ლოგში წერს და `/auth/forgot-password`-ის პასუხში აბრუნებს
+`devResetUrl`-ს, რომ ლოკალურად დემონსტრირება შეიძლებოდეს.
+
 ## API
 
 | მეთოდი | მისამართი | აღწერა |
@@ -123,6 +173,9 @@ Bot token: `@BotFather` → `/newbot`. Chat ID: `@userinfobot` ან `getUpdate
 | POST | `/api/v1/auth/login` | ავტორიზაცია |
 | POST | `/api/v1/auth/refresh` | token-ის განახლება |
 | POST | `/api/v1/auth/logout` | გასვლა |
+| POST | `/api/v1/auth/forgot-password` | აღდგენის ბმულის გაგზავნა |
+| POST | `/api/v1/auth/reset-password` | ახალი პაროლის დაყენება |
+| POST | `/api/v1/auth/change-password` | პაროლის შეცვლა (ავტორიზებული) |
 | GET/PUT | `/api/v1/preferences` | პარამეტრები |
 | GET/POST | `/api/v1/vehicles` | მანქანების სია / დამატება |
 | GET/PUT/DELETE | `/api/v1/vehicles/{id}` | მანქანის ნახვა / რედაქტირება / წაშლა |
@@ -144,7 +197,7 @@ cd backend
 dotnet test
 ```
 
-მიმდინარე შედეგი: **29/29 passed** — n8n კლიენტი/პრომპტები, vehicles და reminders კონტროლერები.
+მიმდინარე შედეგი: **29/29 backend** და **20/20 frontend** ტესტი passed.
 
 ## პროექტის სტრუქტურა
 

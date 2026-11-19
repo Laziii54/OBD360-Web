@@ -122,6 +122,21 @@ $danger: #b3564d;
     text-align: center;
   }
 
+  .auth-secondary {
+    margin-top: -0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    a {
+      color: $accent;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   a {
     color: $accent;
     font-weight: 600;

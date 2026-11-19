@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,17 +21,26 @@ public class AuthController : ControllerBase
     private readonly ApplicationDbContext _db;
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _configuration;
+    private readonly IEmailSender _emailSender;
+    private readonly IWebHostEnvironment _environment;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext db,
         ITokenService tokenService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IEmailSender emailSender,
+        IWebHostEnvironment environment,
+        ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _db = db;
         _tokenService = tokenService;
         _configuration = configuration;
+        _emailSender = emailSender;
+        _environment = environment;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -126,6 +136,116 @@ public class AuthController : ControllerBase
 
         Response.Cookies.Delete(RefreshCookieName);
         return NoContent();
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(ForgotPasswordRequest request)
+    {
+        const string genericMessage =
+            "თუ ეს ელფოსტა დარეგისტრირებულია, პაროლის აღდგენის ბმული გამოგზავნილია.";
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        string? devResetUrl = null;
+
+        if (user is not null)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var frontendBaseUrl = _configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200";
+            var resetUrl =
+                $"{frontendBaseUrl.TrimEnd('/')}/reset-password" +
+                $"?email={Uri.EscapeDataString(user.Email!)}" +
+                $"&token={Uri.EscapeDataString(token)}";
+
+            try
+            {
+                var sent = await _emailSender.SendPasswordResetAsync(
+                    user.Email!,
+                    user.DisplayName,
+                    resetUrl);
+
+                // Without SMTP the API logs the link. In development it is returned
+                // to the browser so the flow can be demonstrated locally.
+                if (!sent && _environment.IsDevelopment())
+                {
+                    devResetUrl = resetUrl;
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Could not send the password-reset email for {Email}.", user.Email);
+            }
+        }
+
+        return Ok(new ForgotPasswordResponse(genericMessage, devResetUrl));
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return BadRequest(new { message = "ბმული არასწორია ან ვადაგასულია." });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return ValidationProblem(new ValidationProblemDetails(
+                result.Errors.ToDictionary(error => error.Code, error => new[] { error.Description })));
+        }
+
+        await RevokeRefreshSessionsAsync(user.Id);
+        Response.Cookies.Delete(RefreshCookieName);
+
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(User.GetUserId().ToString());
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _userManager.ChangePasswordAsync(
+            user,
+            request.CurrentPassword,
+            request.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return ValidationProblem(new ValidationProblemDetails(
+                result.Errors.ToDictionary(error => error.Code, error => new[] { error.Description })));
+        }
+
+        await RevokeRefreshSessionsAsync(user.Id);
+        Response.Cookies.Delete(RefreshCookieName);
+
+        return NoContent();
+    }
+
+    private async Task RevokeRefreshSessionsAsync(Guid userId)
+    {
+        var sessions = await _db.RefreshSessions
+            .Where(session => session.UserId == userId && session.RevokedAt == null)
+            .ToListAsync();
+
+        if (sessions.Count == 0)
+        {
+            return;
+        }
+
+        var revokedAt = DateTime.UtcNow;
+        foreach (var session in sessions)
+        {
+            session.RevokedAt = revokedAt;
+        }
+
+        await _db.SaveChangesAsync();
     }
 
     private async Task<AuthResponse> IssueTokensAsync(ApplicationUser user)

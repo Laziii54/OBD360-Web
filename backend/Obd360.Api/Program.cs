@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Obd360.Api.Integrations.N8n;
+using Obd360.Core.Interfaces;
 using Obd360.Infrastructure;
 using Obd360.Infrastructure.Data;
 using Obd360.Infrastructure.Identity;
@@ -33,6 +34,14 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddN8nIntegration(builder.Configuration);
+
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(SmtpOptions.SectionName));
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(1);
+});
 
 builder.Services
     .AddIdentity<ApplicationUser, ApplicationRole>(options =>

@@ -2,7 +2,15 @@ import { Service, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, finalize, map, of, shareReplay, tap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
+import {
+  AuthResponse,
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+} from '../models/auth.model';
 
 const ACCESS_TOKEN_KEY = 'obd360_access_token';
 const USER_KEY = 'obd360_user';
@@ -36,6 +44,21 @@ export class Auth {
     return this.http
       .post<AuthResponse>(`${API_BASE_URL}/auth/login`, request, { withCredentials: true })
       .pipe(tap((response) => this.setSession(response)));
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
+    return this.http.post<ForgotPasswordResponse>(
+      `${API_BASE_URL}/auth/forgot-password`,
+      request
+    );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${API_BASE_URL}/auth/reset-password`, request);
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.http.post<void>(`${API_BASE_URL}/auth/change-password`, request);
   }
 
   // Parallel callers share one request, because the server rotates the refresh token.
