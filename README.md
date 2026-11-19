@@ -229,6 +229,12 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 | POST | `/api/v1/admin/users/{id}/toggle-role` | Admin როლის გადართვა |
 | GET | `/api/v1/admin/scans?search=` | ყველა სკანირება |
 
+## პრეზენტაცია
+
+- `docs/slides/OBD360-Web-Presentation.pptx` — 18 სლაიდი
+- `docs/slides/OBD360-Web-Presentation.pdf` — PDF ვერსია
+- სლაიდებში: OBD-II/ECU დიაგრამა, DTC კატალოგი (13,629), კოდის ნაკადი, არქიტექტურა და დემო.
+
 ## ტესტები
 
 ```powershell
