@@ -41,6 +41,7 @@ builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IPasswordResetCodeService, PasswordResetCodeService>();
+builder.Services.AddHostedService<ReminderNotificationService>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {

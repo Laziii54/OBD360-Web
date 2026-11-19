@@ -82,8 +82,19 @@ export class ForgotPassword {
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting.set(false);
+
+        const validationErrors = error.error?.errors as
+          | Record<string, string[]>
+          | undefined;
+
+        const firstValidationError = validationErrors
+          ? Object.values(validationErrors).flat()[0]
+          : null;
+
         this.errorMessage.set(
-          error.error?.message ?? 'კოდი არასწორია ან ვადაგასულია.'
+          firstValidationError ??
+            error.error?.message ??
+            'კოდი არასწორია ან ვადაგასულია.'
         );
       },
     });

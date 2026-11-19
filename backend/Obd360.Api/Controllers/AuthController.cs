@@ -209,6 +209,7 @@ public class AuthController : ControllerBase
                 result.Errors.ToDictionary(error => error.Code, error => new[] { error.Description })));
         }
 
+        _resetCodes.Remove(user.Email!);
         await RevokeRefreshSessionsAsync(user.Id);
         Response.Cookies.Delete(RefreshCookieName);
 

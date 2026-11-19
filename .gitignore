@@ -20,6 +20,9 @@
 **/.n8n/
 n8n-data/
 
+# local password-reset code store
+**/App_Data/
+
 # logs and temporary files
 *.log
 *.tmp
