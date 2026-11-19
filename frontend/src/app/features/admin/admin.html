@@ -10,43 +10,48 @@
     <div class="toast">{{ toast() }}</div>
   }
 
-  <section class="summary-grid">
-    <div class="summary-card">
-      <span>USERS</span>
-      <h2>{{ users().length }}</h2>
-      <p>Registered accounts</p>
-    </div>
+  @if (loading()) {
+    <p class="state-message">იტვირთება...</p>
+  } @else if (errorMessage()) {
+    <p class="state-message is-error">{{ errorMessage() }}</p>
+  } @else {
+    <section class="summary-grid">
+      <div class="summary-card">
+        <span>USERS</span>
+        <h2>{{ overview()?.users ?? users().length }}</h2>
+        <p>Registered accounts</p>
+      </div>
 
-    <div class="summary-card">
-      <span>VEHICLES</span>
-      <h2>{{ totalVehicles() }}</h2>
-      <p>Across all users</p>
-    </div>
+      <div class="summary-card">
+        <span>VEHICLES</span>
+        <h2>{{ overview()?.vehicles ?? 0 }}</h2>
+        <p>Across all users</p>
+      </div>
 
-    <div class="summary-card">
-      <span>SCANS</span>
-      <h2>{{ totalScans() }}</h2>
-      <p>Diagnostic sessions</p>
-    </div>
+      <div class="summary-card">
+        <span>SCANS</span>
+        <h2>{{ overview()?.scans ?? 0 }}</h2>
+        <p>Diagnostic sessions</p>
+      </div>
 
-    <div class="summary-card">
-      <span>DTC CODES</span>
-      <h2>{{ dtcCodeCount }}</h2>
-      <p>Catalog entries</p>
-    </div>
-  </section>
+      <div class="summary-card">
+        <span>DTC CODES</span>
+        <h2>{{ overview()?.dtcCodes ?? 0 }}</h2>
+        <p>Catalog entries</p>
+      </div>
+    </section>
 
-  <nav class="admin-tabs">
-    <button type="button" [class.active]="tab() === 'overview'" (click)="setTab('overview')">
-      Overview
-    </button>
-    <button type="button" [class.active]="tab() === 'users'" (click)="setTab('users')">
-      Users
-    </button>
-    <button type="button" [class.active]="tab() === 'scans'" (click)="setTab('scans')">
-      Scan History
-    </button>
-  </nav>
+    <nav class="admin-tabs">
+      <button type="button" [class.active]="tab() === 'overview'" (click)="setTab('overview')">
+        Overview
+      </button>
+      <button type="button" [class.active]="tab() === 'users'" (click)="setTab('users')">
+        Users
+      </button>
+      <button type="button" [class.active]="tab() === 'scans'" (click)="setTab('scans')">
+        Scan History
+      </button>
+    </nav>
 
   @if (tab() === 'overview') {
     <div class="overview-grid">
@@ -73,10 +78,10 @@
               @for (user of recentUsers(); track user.id) {
                 <tr>
                   <td>
-                    <strong>{{ user.name }}</strong>
+                    <strong>{{ user.displayName }}</strong>
                     <small>{{ user.email }}</small>
                   </td>
-                  <td><span class="badge" [class.admin]="user.role === 'Admin'">{{ user.role }}</span></td>
+                  <td><span class="badge" [class.admin]="user.roles.includes('Admin')">{{ user.roles.includes('Admin') ? 'Admin' : 'User' }}</span></td>
                   <td>{{ user.joinedAt | date: 'dd.MM.yyyy' }}</td>
                 </tr>
               }
@@ -160,16 +165,16 @@
           <tbody>
             @for (user of filteredUsers(); track user.id) {
               <tr>
-                <td><strong>{{ user.name }}</strong></td>
+                <td><strong>{{ user.displayName }}</strong></td>
                 <td>{{ user.email }}</td>
-                <td><span class="badge" [class.admin]="user.role === 'Admin'">{{ user.role }}</span></td>
+                <td><span class="badge" [class.admin]="user.roles.includes('Admin')">{{ user.roles.includes('Admin') ? 'Admin' : 'User' }}</span></td>
                 <td>{{ user.vehicles }}</td>
                 <td>{{ user.scans }}</td>
                 <td>{{ user.joinedAt | date: 'dd.MM.yyyy' }}</td>
                 <td>
                   <div class="row-actions">
                     <button type="button" class="text-button" (click)="toggleRole(user)">
-                      {{ user.role === 'Admin' ? 'Make user' : 'Make admin' }}
+                      {{ user.roles.includes('Admin') ? 'Make user' : 'Make admin' }}
                     </button>
                     <button type="button" class="text-button danger" (click)="deleteUser(user)">
                       Delete
@@ -223,7 +228,7 @@
                 <td>{{ scan.scannedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
                 <td>{{ scan.user }}</td>
                 <td><strong>{{ scan.vehicle }}</strong></td>
-                <td class="mono">{{ scan.vin }}</td>
+                <td class="mono">{{ scan.vin || '—' }}</td>
                 <td>
                   @if (scan.codes.length) {
                     <span class="code-list">{{ scan.codes.join(', ') }}</span>
@@ -244,6 +249,7 @@
         </table>
       </div>
     </section>
+  }
   }
 
 </div>

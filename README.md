@@ -182,6 +182,23 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 > კმ-ით რემაინდერები ჯერ არ იგზავნება, რადგან მანქანის მიმდინარე გარბენი არ ინახება.
 > ტესტისთვის შექმენი რემაინდერი დღევანდელი ან გასული თარიღით და გადაუშვი API.
 
+## Admin API
+
+`/api/v1/admin` — მხოლოდ **Admin** როლისთვის. Frontend: `/app/admin`.
+
+- `GET /overview` — users / vehicles / scans / DTC რაოდენობები
+- `GET /users?search=` — მომხმარებლები, როლები და აქტივობა
+- `DELETE /users/{id}` — მომხმარებლის წაშლა (საკუთარი თავის და ბოლო Admin-ის გარდა)
+- `POST /users/{id}/toggle-role` — Admin როლის დამატება/მოხსნა
+- `GET /scans?search=` — ყველა მომხმარებლის ბოლო სკანირებები
+
+## ლოგირება და Swagger
+
+- HTTP request logging: method, path, status, duration.
+- Auth ლოგები: register, login success/failure, password reset/change.
+- Reminder email ლოგები: გაგზავნა/შეცდომა.
+- Swagger: `http://localhost:5269/swagger` — API info, JWT Authorize, XML summaries (Admin/Auth).
+
 ## API
 
 | მეთოდი | მისამართი | აღწერა |
@@ -206,6 +223,11 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 | POST | `/api/v1/ai/latest-scan-report` | ბოლო სკანირების AI რეპორტი |
 | POST | `/api/v1/ai/ask` | AI ასისტენტის კითხვა |
 | GET | `/api/v1/ai/conversation` | საუბრის ისტორია |
+| GET | `/api/v1/admin/overview` | ადმინის სტატისტიკა |
+| GET | `/api/v1/admin/users?search=` | მომხმარებლების სია |
+| DELETE | `/api/v1/admin/users/{id}` | მომხმარებლის წაშლა |
+| POST | `/api/v1/admin/users/{id}/toggle-role` | Admin როლის გადართვა |
+| GET | `/api/v1/admin/scans?search=` | ყველა სკანირება |
 
 ## ტესტები
 

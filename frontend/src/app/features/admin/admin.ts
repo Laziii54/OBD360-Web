@@ -1,6 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { AdminApi, AdminScan, AdminUser } from '../../core/services/admin.service';
+import { forkJoin } from 'rxjs';
+import {
+  AdminApi,
+  AdminOverview,
+  AdminScan,
+  AdminUser,
+} from '../../core/services/admin.service';
 
 type AdminTab = 'overview' | 'users' | 'scans';
 
@@ -13,13 +19,15 @@ type AdminTab = 'overview' | 'users' | 'scans';
 export class Admin {
   private readonly api = inject(AdminApi);
 
-  readonly dtcCodeCount = this.api.dtcCodeCount;
   readonly tab = signal<AdminTab>('overview');
+  readonly overview = signal<AdminOverview | null>(null);
   readonly users = signal<AdminUser[]>([]);
   readonly scans = signal<AdminScan[]>([]);
   readonly userSearch = signal('');
   readonly scanSearch = signal('');
   readonly toast = signal<string | null>(null);
+  readonly loading = signal(true);
+  readonly errorMessage = signal<string | null>(null);
 
   readonly filteredUsers = computed(() => {
     const term = this.userSearch().trim().toLowerCase();
@@ -27,9 +35,9 @@ export class Admin {
     return this.users().filter(
       (user) =>
         !term ||
-        user.name.toLowerCase().includes(term) ||
+        user.displayName.toLowerCase().includes(term) ||
         user.email.toLowerCase().includes(term) ||
-        user.role.toLowerCase().includes(term)
+        user.roles.some((role) => role.toLowerCase().includes(term))
     );
   });
 
@@ -41,18 +49,10 @@ export class Admin {
         !term ||
         scan.user.toLowerCase().includes(term) ||
         scan.vehicle.toLowerCase().includes(term) ||
-        scan.vin.toLowerCase().includes(term) ||
+        scan.vin?.toLowerCase().includes(term) ||
         scan.codes.some((code) => code.toLowerCase().includes(term))
     );
   });
-
-  readonly totalVehicles = computed(() =>
-    this.users().reduce((sum, user) => sum + user.vehicles, 0)
-  );
-
-  readonly totalScans = computed(() =>
-    this.users().reduce((sum, user) => sum + user.scans, 0)
-  );
 
   readonly recentUsers = computed(() => this.users().slice(0, 4));
   readonly recentScans = computed(() => this.scans().slice(0, 4));
@@ -66,39 +66,58 @@ export class Admin {
   }
 
   reload(): void {
-    this.api.listUsers().subscribe((users) => this.users.set(users));
-    this.api.listScans().subscribe((scans) => this.scans.set(scans));
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    forkJoin({
+      overview: this.api.overview(),
+      users: this.api.listUsers(),
+      scans: this.api.listScans(),
+    }).subscribe({
+      next: ({ overview, users, scans }) => {
+        this.overview.set(overview);
+        this.users.set(users);
+        this.scans.set(scans);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.errorMessage.set('ადმინის მონაცემები ვერ ჩაიტვირთა.');
+      },
+    });
   }
 
   deleteUser(user: AdminUser): void {
     const confirmed = confirm(
-      `წავშალო მომხმარებელი ${user.name}? ელფოსტა ${user.email} და მისი მონაცემებიც წაიშლება.`
+      `წავშალო მომხმარებელი ${user.displayName}? ელფოსტა ${user.email} და მისი მონაცემებიც წაიშლება.`
     );
 
     if (!confirmed) {
       return;
     }
 
-    this.api.deleteUser(user.id).subscribe(() => {
-      this.users.set(this.users().filter((item) => item.id !== user.id));
-      this.showToast('მომხმარებელი წაშლილია.');
+    this.api.deleteUser(user.id).subscribe({
+      next: () => {
+        this.showToast('მომხმარებელი წაშლილია.');
+        this.reload();
+      },
+      error: () => this.showToast('მომხმარებლის წაშლა ვერ მოხდა.'),
     });
   }
 
   toggleRole(user: AdminUser): void {
-    this.api.toggleRole(user.id).subscribe((updated) => {
-      if (!updated) {
-        return;
-      }
-
-      this.users.set(
-        this.users().map((item) => (item.id === updated.id ? updated : item))
-      );
-      this.showToast(
-        updated.role === 'Admin'
-          ? `${updated.name} ახლა Admin-ია.`
-          : `${updated.name} ახლა User-ია.`
-      );
+    this.api.toggleRole(user.id).subscribe({
+      next: (updated) => {
+        this.users.set(
+          this.users().map((item) => (item.id === updated.id ? updated : item))
+        );
+        this.showToast(
+          updated.roles.includes('Admin')
+            ? `${updated.displayName} ახლა Admin-ია.`
+            : `${updated.displayName} ახლა User-ია.`
+        );
+      },
+      error: () => this.showToast('როლის შეცვლა ვერ მოხდა.'),
     });
   }
 

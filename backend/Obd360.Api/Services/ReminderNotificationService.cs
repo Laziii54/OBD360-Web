@@ -147,6 +147,14 @@ public sealed class ReminderNotificationService : BackgroundService
                 SentAt = DateTime.UtcNow
             });
 
+            if (sent)
+            {
+                _logger.LogInformation(
+                    "Reminder digest sent to {Email} ({Count} reminders).",
+                    first.Email,
+                    reminders.Count);
+            }
+
             await db.SaveChangesAsync(cancellationToken);
         }
     }

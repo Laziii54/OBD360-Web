@@ -51,6 +51,16 @@
   font-weight: 700;
 }
 
+.state-message {
+  padding: 24px;
+  color: var(--muted);
+  font-size: 12px;
+
+  &.is-error {
+    color: var(--danger);
+  }
+}
+
 /* SUMMARY */
 
 .summary-grid {

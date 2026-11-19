@@ -13,6 +13,7 @@ using Obd360.Infrastructure.Identity;
 
 namespace Obd360.Api.Controllers;
 
+/// <summary>Registration, login, token refresh and password recovery.</summary>
 [ApiController]
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
@@ -48,6 +49,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>Creates a new user account and returns access and refresh tokens.</summary>
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
     {
@@ -83,21 +85,28 @@ public class AuthController : ControllerBase
         });
         await _db.SaveChangesAsync();
 
+        _logger.LogInformation("User {Email} registered.", user.Email);
+
         return await IssueTokensAsync(user);
     }
 
+    /// <summary>Authenticates a user by email and password.</summary>
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
+            _logger.LogWarning("Failed login attempt for {Email}.", request.Email);
             return Unauthorized(new { message = "არასწორი ელფოსტა ან პაროლი." });
         }
+
+        _logger.LogInformation("User {Email} logged in.", user.Email);
 
         return await IssueTokensAsync(user);
     }
 
+    /// <summary>Rotates the refresh-token cookie and issues a new access token.</summary>
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> Refresh()
     {
@@ -125,6 +134,7 @@ public class AuthController : ControllerBase
         return await IssueTokensAsync(user);
     }
 
+    /// <summary>Revokes the current refresh session and clears the cookie.</summary>
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
@@ -143,6 +153,7 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Sends a six-digit password-reset code to the account email.</summary>
     [HttpPost("forgot-password")]
     public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(ForgotPasswordRequest request)
     {
@@ -151,6 +162,8 @@ public class AuthController : ControllerBase
 
         var user = await _userManager.FindByEmailAsync(request.Email);
         string? devCode = null;
+
+        _logger.LogInformation("Password reset requested for {Email}.", request.Email);
 
         if (user is not null)
         {
@@ -187,6 +200,7 @@ public class AuthController : ControllerBase
         return Ok(new ForgotPasswordResponse(genericMessage, devCode));
     }
 
+    /// <summary>Sets a new password using the emailed six-digit code.</summary>
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
     {
@@ -210,12 +224,14 @@ public class AuthController : ControllerBase
         }
 
         _resetCodes.Remove(user.Email!);
+        _logger.LogInformation("Password reset completed for {Email}.", user.Email);
         await RevokeRefreshSessionsAsync(user.Id);
         Response.Cookies.Delete(RefreshCookieName);
 
         return NoContent();
     }
 
+    /// <summary>Changes the password of the authenticated user.</summary>
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
@@ -238,6 +254,7 @@ public class AuthController : ControllerBase
         }
 
         await RevokeRefreshSessionsAsync(user.Id);
+        _logger.LogInformation("Password changed for {Email}.", user.Email);
         Response.Cookies.Delete(RefreshCookieName);
 
         return NoContent();
