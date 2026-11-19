@@ -235,6 +235,12 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 - `docs/slides/OBD360-Web-Presentation.pdf` — PDF ვერსია
 - სლაიდებში: OBD-II/ECU დიაგრამა, DTC კატალოგი (13,629), კოდის ნაკადი, არქიტექტურა და დემო.
 
+## დოკუმენტაცია
+
+- `docs/report/OBD360-Web-Documentation.docx` — სრული პროექტის დოკუმენტაცია (36 გვერდი)
+- `docs/report/OBD360-Web-Documentation.pdf` — PDF ვერსია
+- მოიცავს: OBD-II თეორია, არქიტექტურა, მონაცემთა მოდელი, API, OBD-II კოდი, უსაფრთხოება, ტესტირება, გაშვება და მომხმარებლის გზამკვლევი.
+
 ## ტესტები
 
 ```powershell
