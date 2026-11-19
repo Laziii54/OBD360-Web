@@ -18,11 +18,11 @@ public record ForgotPasswordRequest(
 
 public record ForgotPasswordResponse(
     string Message,
-    string? DevResetUrl);
+    string? DevCode);
 
 public record ResetPasswordRequest(
     [Required, EmailAddress] string Email,
-    [Required] string Token,
+    [Required, RegularExpression("^[0-9]{6}$")] string Code,
     [Required, MinLength(8)] string NewPassword);
 
 public record ChangePasswordRequest(

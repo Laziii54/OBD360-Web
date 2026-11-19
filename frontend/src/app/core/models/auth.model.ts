@@ -23,12 +23,12 @@ export interface ForgotPasswordRequest {
 
 export interface ForgotPasswordResponse {
   message: string;
-  devResetUrl: string | null;
+  devCode: string | null;
 }
 
 export interface ResetPasswordRequest {
   email: string;
-  token: string;
+  code: string;
   newPassword: string;
 }
 

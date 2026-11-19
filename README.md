@@ -117,17 +117,17 @@ Bot token: `@BotFather` → `/newbot`. Chat ID: `@userinfobot` ან `getUpdate
 
 ## პაროლის აღდგენა
 
-მომხმარებელი ჰკითხულობს ელფოსტას, იღებს ერთჯერად ბმულს და აყენებს ახალ პაროლს.
+მომხმარებელი ჰკითხულობს ელფოსტას, იღებს **6-ნიშნა კოდს** და აყენებს ახალ პაროლს.
 
 ```text
 POST /api/v1/auth/forgot-password   { email }
-POST /api/v1/auth/reset-password    { email, token, newPassword }
+POST /api/v1/auth/reset-password    { email, code, newPassword }
 POST /api/v1/auth/change-password   { currentPassword, newPassword }  (ავტორიზებული)
 ```
 
 უსაფრთხოება:
 
-- ბმული მოქმედებს **1 საათი** და მხოლოდ **ერთხელ**.
+- კოდი მოქმედებს **10 წუთი**, გამოიყენება **მხოლოდ ერთხელ** და აქვს **5 მცდელობა**.
 - არ არსებობს user enumeration — უცნობ ელფოსტაზეც იგივე პასუხი ბრუნდება.
 - პაროლის შეცვლის/აღდგენის შემდეგ ყველა refresh session უქმდება.
 
@@ -144,9 +144,6 @@ POST /api/v1/auth/change-password   { currentPassword, newPassword }  (ავტ
   "FromAddress": "your@gmail.com",
   "FromName": "OBD360",
   "EnableSsl": true
-},
-"App": {
-  "FrontendBaseUrl": "http://localhost:4200"
 }
 ```
 
@@ -158,12 +155,11 @@ $env:Smtp__Port = "587"
 $env:Smtp__UserName = "your@gmail.com"
 $env:Smtp__Password = "APP_PASSWORD"
 $env:Smtp__FromAddress = "your@gmail.com"
-$env:App__FrontendBaseUrl = "http://localhost:4200"
 ```
 
 Gmail-ისთვის გამოიყენე **App Password**, არა ჩვეულებრივი პაროლი.
-SMTP-ის გარეშე (Development) API ბმულს ლოგში წერს და `/auth/forgot-password`-ის პასუხში აბრუნებს
-`devResetUrl`-ს, რომ ლოკალურად დემონსტრირება შეიძლებოდეს.
+SMTP-ის გარეშე (Development) API კოდს ლოგში წერს და `/auth/forgot-password`-ის პასუხში აბრუნებს
+`devCode`-ს, რომ ლოკალურად დემონსტრირება შეიძლებოდეს.
 
 ## API
 
@@ -173,8 +169,8 @@ SMTP-ის გარეშე (Development) API ბმულს ლოგში
 | POST | `/api/v1/auth/login` | ავტორიზაცია |
 | POST | `/api/v1/auth/refresh` | token-ის განახლება |
 | POST | `/api/v1/auth/logout` | გასვლა |
-| POST | `/api/v1/auth/forgot-password` | აღდგენის ბმულის გაგზავნა |
-| POST | `/api/v1/auth/reset-password` | ახალი პაროლის დაყენება |
+| POST | `/api/v1/auth/forgot-password` | აღდგენის კოდის გაგზავნა |
+| POST | `/api/v1/auth/reset-password` | კოდით ახალი პაროლის დაყენება |
 | POST | `/api/v1/auth/change-password` | პაროლის შეცვლა (ავტორიზებული) |
 | GET/PUT | `/api/v1/preferences` | პარამეტრები |
 | GET/POST | `/api/v1/vehicles` | მანქანების სია / დამატება |
@@ -197,7 +193,7 @@ cd backend
 dotnet test
 ```
 
-მიმდინარე შედეგი: **29/29 backend** და **20/20 frontend** ტესტი passed.
+მიმდინარე შედეგი: **29/29 backend** და **19/19 frontend** ტესტი passed.
 
 ## პროექტის სტრუქტურა
 

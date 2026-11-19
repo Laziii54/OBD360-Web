@@ -38,7 +38,6 @@ services:
       Cors__AllowedOrigins__0: http://localhost:4200
       N8n__BaseUrl: http://n8n:5678
       N8n__AlertPath: /webhook/obd360/critical-dtc
-      App__FrontendBaseUrl: http://localhost:4200
       Smtp__Host: "${SMTP_HOST:-}"
       Smtp__Port: "${SMTP_PORT:-587}"
       Smtp__UserName: "${SMTP_USERNAME:-}"

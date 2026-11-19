@@ -17,20 +17,20 @@ public sealed class SmtpEmailSender : IEmailSender
         _logger = logger;
     }
 
-    public async Task<bool> SendPasswordResetAsync(
+    public async Task<bool> SendPasswordResetCodeAsync(
         string toEmail,
         string displayName,
-        string resetUrl,
+        string code,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_options.Host) ||
             string.IsNullOrWhiteSpace(_options.FromAddress))
         {
-            // Local development fallback: the link is printed to the API console.
+            // Local development fallback: the code is printed to the API console.
             _logger.LogWarning(
-                "SMTP is not configured. Password reset link for {Email}: {ResetUrl}",
+                "SMTP is not configured. Password reset code for {Email}: {Code}",
                 toEmail,
-                resetUrl);
+                code);
             return false;
         }
 
@@ -39,20 +39,20 @@ public sealed class SmtpEmailSender : IEmailSender
             : _options.FromAddress;
 
         var safeName = WebUtility.HtmlEncode(displayName);
-        var safeUrl = WebUtility.HtmlEncode(resetUrl);
+        var safeCode = WebUtility.HtmlEncode(code);
 
         using var message = new MailMessage
         {
             From = new MailAddress(fromAddress, _options.FromName),
-            Subject = "OBD360 — პაროლის აღდგენა",
+            Subject = "OBD360 — პაროლის აღდგენის კოდი",
             IsBodyHtml = true,
             Body = $"""
                 <div style="font-family:Segoe UI,Arial,sans-serif;color:#20251f;line-height:1.6">
                   <h2 style="font-weight:800">OBD360</h2>
                   <p>გამარჯობა, {safeName}.</p>
-                  <p>მივიღეთ თქვენი ანგარიშის პაროლის აღდგენის მოთხოვნა. ახალი პაროლის დასაყენებლად გახსენით ბმული:</p>
-                  <p><a href="{safeUrl}" style="color:#3f5d4e;font-weight:700">პაროლის აღდგენა</a></p>
-                  <p style="color:#72776e;font-size:13px">ბმული მოქმედებს 1 საათი. თუ მოთხოვნა თქვენ არ გამოგიგზავნიათ, უგულებელყავით ეს წერილი.</p>
+                  <p>პაროლის აღდგენისთვის შეიყვანე ეს კოდი:</p>
+                  <p style="font-size:30px;font-weight:800;letter-spacing:8px;color:#3f5d4e">{safeCode}</p>
+                  <p style="color:#72776e;font-size:13px">კოდი მოქმედებს 10 წუთი და გამოიყენება მხოლოდ ერთხელ. თუ მოთხოვნა თქვენ არ გამოგიგზავნიათ, უგულებელყავით ეს წერილი.</p>
                 </div>
                 """
         };

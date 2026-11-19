@@ -3,7 +3,6 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
-import { ForgotPasswordResponse } from '../../../core/models/auth.model';
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
@@ -15,27 +14,37 @@ export class ForgotPassword {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(Auth);
 
+  readonly step = signal<'email' | 'reset' | 'done'>('email');
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
-  readonly result = signal<ForgotPasswordResponse | null>(null);
+  readonly devCode = signal<string | null>(null);
+  readonly email = signal('');
 
-  readonly form = this.fb.nonNullable.group({
+  readonly emailForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
   });
 
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+  readonly resetForm = this.fb.nonNullable.group({
+    code: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]],
+    newPassword: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [Validators.required]],
+  });
+
+  submitEmail(): void {
+    if (this.emailForm.invalid) {
+      this.emailForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    this.auth.forgotPassword(this.form.getRawValue()).subscribe({
+    this.auth.forgotPassword(this.emailForm.getRawValue()).subscribe({
       next: (response) => {
-        this.result.set(response);
+        this.email.set(this.emailForm.getRawValue().email.trim());
+        this.devCode.set(response.devCode);
         this.isSubmitting.set(false);
+        this.step.set('reset');
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting.set(false);
@@ -44,5 +53,46 @@ export class ForgotPassword {
         );
       },
     });
+  }
+
+  submitReset(): void {
+    if (this.resetForm.invalid) {
+      this.resetForm.markAllAsTouched();
+      return;
+    }
+
+    const { code, newPassword, confirmPassword } = this.resetForm.getRawValue();
+
+    if (newPassword !== confirmPassword) {
+      this.errorMessage.set('პაროლები არ ემთხვევა.');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    this.auth.resetPassword({
+      email: this.email(),
+      code: code.trim(),
+      newPassword,
+    }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.step.set('done');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(
+          error.error?.message ?? 'კოდი არასწორია ან ვადაგასულია.'
+        );
+      },
+    });
+  }
+
+  restart(): void {
+    this.step.set('email');
+    this.resetForm.reset();
+    this.devCode.set(null);
+    this.errorMessage.set(null);
   }
 }

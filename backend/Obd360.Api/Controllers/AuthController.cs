@@ -1,8 +1,10 @@
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obd360.Api.Dtos;
+using Obd360.Api.Services;
 using Obd360.Core.Entities;
 using Obd360.Core.Enums;
 using Obd360.Core.Interfaces;
@@ -22,6 +24,7 @@ public class AuthController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _configuration;
     private readonly IEmailSender _emailSender;
+    private readonly IPasswordResetCodeService _resetCodes;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AuthController> _logger;
 
@@ -31,6 +34,7 @@ public class AuthController : ControllerBase
         ITokenService tokenService,
         IConfiguration configuration,
         IEmailSender emailSender,
+        IPasswordResetCodeService resetCodes,
         IWebHostEnvironment environment,
         ILogger<AuthController> logger)
     {
@@ -39,6 +43,7 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
         _configuration = configuration;
         _emailSender = emailSender;
+        _resetCodes = resetCodes;
         _environment = environment;
         _logger = logger;
     }
@@ -142,41 +147,44 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(ForgotPasswordRequest request)
     {
         const string genericMessage =
-            "თუ ეს ელფოსტა დარეგისტრირებულია, პაროლის აღდგენის ბმული გამოგზავნილია.";
+            "თუ ეს ელფოსტა დარეგისტრირებულია, პაროლის აღდგენის კოდი გამოგზავნილია.";
 
         var user = await _userManager.FindByEmailAsync(request.Email);
-        string? devResetUrl = null;
+        string? devCode = null;
 
         if (user is not null)
         {
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var frontendBaseUrl = _configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200";
-            var resetUrl =
-                $"{frontendBaseUrl.TrimEnd('/')}/reset-password" +
-                $"?email={Uri.EscapeDataString(user.Email!)}" +
-                $"&token={Uri.EscapeDataString(token)}";
+            var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            _resetCodes.Store(user.Email!, code, resetToken);
 
             try
             {
-                var sent = await _emailSender.SendPasswordResetAsync(
+                var sent = await _emailSender.SendPasswordResetCodeAsync(
                     user.Email!,
                     user.DisplayName,
-                    resetUrl);
+                    code);
 
-                // Without SMTP the API logs the link. In development it is returned
+                // Without SMTP the API logs the code. In development it is returned
                 // to the browser so the flow can be demonstrated locally.
                 if (!sent && _environment.IsDevelopment())
                 {
-                    devResetUrl = resetUrl;
+                    devCode = code;
                 }
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Could not send the password-reset email for {Email}.", user.Email);
+
+                if (_environment.IsDevelopment())
+                {
+                    devCode = code;
+                }
             }
         }
 
-        return Ok(new ForgotPasswordResponse(genericMessage, devResetUrl));
+        return Ok(new ForgotPasswordResponse(genericMessage, devCode));
     }
 
     [HttpPost("reset-password")]
@@ -185,10 +193,16 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return BadRequest(new { message = "ბმული არასწორია ან ვადაგასულია." });
+            return BadRequest(new { message = "კოდი არასწორია ან ვადაგასულია." });
         }
 
-        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        var validation = _resetCodes.Validate(user.Email!, request.Code);
+        if (!validation.Success || validation.Token is null)
+        {
+            return BadRequest(new { message = validation.Error ?? "კოდი არასწორია ან ვადაგასულია." });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, validation.Token, request.NewPassword);
         if (!result.Succeeded)
         {
             return ValidationProblem(new ValidationProblemDetails(
