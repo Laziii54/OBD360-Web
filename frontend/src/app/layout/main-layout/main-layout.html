@@ -1,7 +1,7 @@
 <div class="app-layout">
 
   <!-- LEFT SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.open]="sidebarOpen()">
 
     <!-- LOGO -->
     <div class="sidebar-header">
@@ -10,6 +10,8 @@
       </div>
 
       <span class="version">VEHICLE DIAGNOSTICS</span>
+
+      <button type="button" class="sidebar-close" (click)="closeSidebar()">Close</button>
     </div>
 
     <!-- CONNECTION STATUS -->
@@ -23,7 +25,7 @@
     </div>
 
     <!-- NAVIGATION -->
-    <nav class="sidebar-navigation">
+    <nav class="sidebar-navigation" (click)="closeSidebar()">
 
       <span class="nav-heading">MAIN MENU</span>
 
@@ -106,6 +108,12 @@
 
   </aside>
 
+  <div
+    class="sidebar-backdrop"
+    [class.visible]="sidebarOpen()"
+    (click)="closeSidebar()"
+  ></div>
+
 
   <!-- RIGHT CONTENT -->
   <div class="main-section">
@@ -114,6 +122,18 @@
     <header class="top-header">
 
       <div class="header-left">
+        <button
+          type="button"
+          class="menu-toggle"
+          [class.open]="sidebarOpen()"
+          (click)="toggleSidebar()"
+          aria-label="Toggle navigation"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <span class="header-label">DIAGNOSTIC PLATFORM</span>
       </div>
 
