@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -116,20 +117,38 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        app.Logger.LogError(
+            exception,
+            "Unhandled exception for {Method} {Path}.",
+            context.Request.Method,
+            context.Request.Path);
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = "სერვერზე მოხდა შეცდომა. სცადეთ მოგვიანებით."
+        });
+    });
+});
+
 using (var scope = app.Services.CreateScope())
 {
-    // Creates the local database and applies pending migrations.
-    if (app.Environment.IsDevelopment())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        await db.Database.MigrateAsync();
+    // Apply pending migrations and seed the catalog in every environment.
+    // The Docker deployment starts with an empty SQL Server volume.
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
 
-        var dtcCatalogFile = Path.Combine(app.Environment.ContentRootPath, "Data", "dtc-catalog.json.gz");
-        var importedCodes = await DtcCatalogSeeder.SeedAsync(db, dtcCatalogFile);
-        if (importedCodes > 0)
-        {
-            app.Logger.LogInformation("Imported {Count} DTC catalog entries.", importedCodes);
-        }
+    var dtcCatalogFile = Path.Combine(app.Environment.ContentRootPath, "Data", "dtc-catalog.json.gz");
+    var importedCodes = await DtcCatalogSeeder.SeedAsync(db, dtcCatalogFile);
+    if (importedCodes > 0)
+    {
+        app.Logger.LogInformation("Imported {Count} DTC catalog entries.", importedCodes);
     }
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
@@ -142,24 +161,16 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("Frontend");
 
 app.UseHttpLogging();
 
-// In development the Angular app calls the API over http://localhost:5269.
-// A redirect there would break the CORS preflight request.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
+// TLS is terminated by the reverse proxy in production (DigitalOcean + Nginx),
+// so the API itself must not redirect HTTP requests to HTTPS.
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

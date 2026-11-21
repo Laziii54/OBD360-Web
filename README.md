@@ -9,10 +9,10 @@ OBD360 Web არის ავტომობილის დიაგნოს�
 - **Bluetooth** — Web Bluetooth-ით OBD-II ადაპტერთან დაკავშირება.
 - **Live Data** — ძრავის ბრუნი, სიჩქარე, ტემპერატურა და სხვა PID-ები.
 - **DTC Scanner** — შეცდომების კოდების წაკითხვა და გასუფთავება.
-- **DTC Catalog** — 13 000+ კოდის ქართული/ინგლისური აღწერა.
+- **DTC Catalog** — 13 629 კოდის ქართული/ინგლისური აღწერა.
 - **ECU Modules / Freeze Frame / Graphs** — მოდულები, freeze frame და გრაფიკები.
 - **Scan History** — წინა სკანირებების ისტორია.
-- **Maintenance Reminders** — შეხსენებები თარიღით ან გარბენით.
+- **Maintenance Reminders** — შეხსენებები თარიღით; გარბენით — სამომავლო გაუმჯობესება.
 - **AI Assistant** — n8n + Google Gemini-ს მეშვეობით ქართულენოვანი დიაგნოსტიკური ახსნები.
 - **Critical DTC Alert** — n8n workflow კრიტიკული კოდებისთვის (Telegram).
 
@@ -25,9 +25,41 @@ OBD360 Web არის ავტომობილის დიაგნოს�
 | Auth | ASP.NET Identity, JWT, refresh token cookie |
 | Automation | n8n 2.47.4, webhook workflows |
 | AI | Google Gemini (`gemini-3.1-flash-lite`) |
-| Tests | xUnit, 29 backend tests |
+| Tests | xUnit + Vitest, 29 backend + 19 frontend |
 
 C4 მოდელი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) — System Context, Container და Component დიაგრამები.
+
+## REST API vs MVC
+
+ეს პროექტი არის **REST API + Angular SPA**, არა server-side MVC.
+
+| MVC (server-side) | ჩვენი პროექტი |
+|---|---|
+| Controller აბრუნებს HTML View-ს (`.cshtml`) | Controller აბრუნებს JSON-ს |
+| `AddControllersWithViews()` | `AddControllers()` |
+| გვერდები სერვერზე გენერირდება | გვერდებს Angular აწყობს |
+| `Views/` საქაღალდე | არ არის `Views/` |
+
+როგორ დავამტკიცოთ:
+
+1. `Program.cs` — `builder.Services.AddControllers();`
+2. `[ApiController]` ყველა controller-ზე.
+3. `ActionResult<T>` / JSON პასუხები.
+4. Angular `HttpClient` იძახებს `/api/v1/...` მისამართებს.
+5. DevTools → Network → response არის JSON.
+
+## მონაცემთა ბაზის დიზაინი
+
+| რესურსი | მდებარეობა |
+|---|---|
+| 15 მოდელი | `backend/Obd360.Core/Entities/`, `Infrastructure/Identity/` |
+| 21 ცხრილი | `database/schema.sql` |
+| EF Core კონფიგურაცია | `backend/Obd360.Infrastructure/Data/ApplicationDbContext.cs` |
+| მიგრაციები | `backend/Obd360.Infrastructure/Migrations/` |
+| DTC seeder | `backend/Obd360.Infrastructure/Services/DtcCatalogSeeder.cs` |
+| ვიზუალი | `docs/report/assets/data-model.png` |
+
+> `ScanSession.cs` ერთ ფაილში აერთიანებს `ScanSession`, `LiveReading`, `DtcRecord` და `DtcCatalogEntry` კლასებს.
 
 ## გაშვება
 
@@ -282,18 +314,29 @@ docker compose up --build
 
 - Frontend: http://localhost:4200
 - API: http://localhost:5269
+- Swagger: http://localhost:5269/swagger
 - n8n: http://localhost:5678
 - SQL Server: localhost:1433
 
-Docker გარემოში connection string, JWT და Telegram ცვლადები გადაეცემა `docker-compose.yml`-იდან. საჭიროების შემთხვევაში შეცვალე `SQL_PASSWORD` და `JWT_SIGNING_KEY`.
+Docker გარემოში connection string, JWT, CORS და Telegram ცვლადები გადაეცემა `docker-compose.yml`-იდან. საჭიროების შემთხვევაში შეცვალე `SQL_PASSWORD`, `JWT_SIGNING_KEY` და `PUBLIC_ORIGIN`.
+
+### DigitalOcean (production)
+
+Droplet-ზე გაშვების ინსტრუქცია: [`docs/deployment/DIGITALOCEAN.md`](docs/deployment/DIGITALOCEAN.md).
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Production override მალავს SQL Server/API/n8n პორტებს და web-ს აკავშირებს მხოლოდ `127.0.0.1:4200`-ზე; TLS-ს ამთავრებს host Nginx.
 
 ## შეზღუდვები / Future work
 
 - ყოველკვირეული PDF რეპორტები (Reports) — მოდელი არსებობს, UI/API ჯერ არა.
-- Admin როლი — როლები seed-ილია, ადმინის UI/API ჯერ არა.
-- Email confirmation / password reset.
-- GitHub Actions CI/CD.
+- Email confirmation — ჯერ არ არის.
+- GitHub Actions CI/CD — ჯერ არ არის.
 - სრული ინტეგრაციული ტესტები რეალურ SQL Server-ზე.
+- DigitalOcean-ის რეალური deployment ჯერ არ გაშვებულა; საჭიროა Droplet/დომენი.
 
 ## ავტორი
 

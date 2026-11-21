@@ -35,7 +35,7 @@ services:
       Jwt__Issuer: Obd360Web
       Jwt__Audience: Obd360WebClient
       Jwt__SigningKey: "${JWT_SIGNING_KEY:-OBD360_Docker_Development_Signing_Key_Change_Me_1234567890}"
-      Cors__AllowedOrigins__0: http://localhost:4200
+      Cors__AllowedOrigins__0: "${PUBLIC_ORIGIN:-http://localhost:4200}"
       N8n__BaseUrl: http://n8n:5678
       N8n__AlertPath: /webhook/obd360/critical-dtc
       Smtp__Host: "${SMTP_HOST:-}"

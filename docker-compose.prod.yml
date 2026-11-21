@@ -1,0 +1,21 @@
+name: obd360
+
+# Production override for a single DigitalOcean Droplet.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Keeps SQL Server, the API and n8n private; only the web container is bound
+# to localhost, where host Nginx terminates TLS.
+services:
+  sqlserver:
+    ports: !reset []
+
+  api:
+    ports: !reset []
+
+  web:
+    ports:
+      - "127.0.0.1:4200:80"
+
+  n8n:
+    ports: !reset []

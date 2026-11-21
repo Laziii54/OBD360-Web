@@ -17,6 +17,12 @@
 - **PPTX:** [`docs/slides/OBD360-Web-Presentation.pptx`](slides/OBD360-Web-Presentation.pptx)
 - **PDF:** [`docs/slides/OBD360-Web-Presentation.pdf`](slides/OBD360-Web-Presentation.pdf)
 
+## დაცვის ჩეკლისტი
+
+- [`docs/DEFENSE-CHECKLIST.md`](DEFENSE-CHECKLIST.md) — ყველა მოთხოვნა: DB, migrations, API, Swagger, JWT, UI, signals, ტესტები, logging, README, DigitalOcean.
+- [`docs/report/TEST-RESULTS.md`](report/TEST-RESULTS.md) — 29 backend + 19 frontend ტესტის შედეგი.
+- [`docs/deployment/DIGITALOCEAN.md`](deployment/DIGITALOCEAN.md) — Droplet + Docker + Nginx + SSL ინსტრუქცია.
+
 ## C4
 
 - [`docs/c4/OBD360 C4.pdf`](c4/OBD360%20C4.pdf)
