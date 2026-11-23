@@ -4,5 +4,17 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "warn"
+  },
+  "/swagger": {
+    "target": "http://localhost:5269",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  },
+  "/health": {
+    "target": "http://localhost:5269",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
   }
 }
