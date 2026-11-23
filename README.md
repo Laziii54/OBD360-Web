@@ -263,9 +263,15 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 
 ## პრეზენტაცია
 
-- `docs/slides/OBD360-Web-Presentation.pptx` — 18 სლაიდი
+- `docs/slides/OBD360-Web-Presentation.pptx` — 18 სლაიდი (სრული ვერსია)
 - `docs/slides/OBD360-Web-Presentation.pdf` — PDF ვერსია
 - სლაიდებში: OBD-II/ECU დიაგრამა, DTC კატალოგი (13,629), კოდის ნაკადი, არქიტექტურა და დემო.
+
+### გამარტივებული ვერსია — OBD2
+
+- `docs/slides/OBD2-Web-Presentation-Simple.pptx` — 13 სლაიდი
+- `docs/slides/OBD2-Web-Presentation-Simple.pdf` — PDF ვერსია
+- ყველა წარწერა **OBD2**-ია; ტექსტი შემცირებულია და გამარტივებულია.
 
 ## დოკუმენტაცია
 

@@ -14,8 +14,10 @@
 
 ## პრეზენტაცია
 
-- **PPTX:** [`docs/slides/OBD360-Web-Presentation.pptx`](slides/OBD360-Web-Presentation.pptx)
-- **PDF:** [`docs/slides/OBD360-Web-Presentation.pdf`](slides/OBD360-Web-Presentation.pdf)
+- **PPTX (სრული):** [`docs/slides/OBD360-Web-Presentation.pptx`](slides/OBD360-Web-Presentation.pptx)
+- **PDF (სრული):** [`docs/slides/OBD360-Web-Presentation.pdf`](slides/OBD360-Web-Presentation.pdf)
+- **PPTX (მარტივი, OBD2):** [`docs/slides/OBD2-Web-Presentation-Simple.pptx`](slides/OBD2-Web-Presentation-Simple.pptx)
+- **PDF (მარტივი, OBD2):** [`docs/slides/OBD2-Web-Presentation-Simple.pdf`](slides/OBD2-Web-Presentation-Simple.pdf)
 
 ## დაცვის ჩეკლისტი
 
