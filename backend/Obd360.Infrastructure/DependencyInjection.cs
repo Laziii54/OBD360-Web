@@ -11,8 +11,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        var useInMemory = configuration.GetValue<bool>("Database:UseInMemory");
+
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        {
+            if (useInMemory)
+            {
+                options.UseInMemoryDatabase("Obd360Demo");
+            }
+            else
+            {
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            }
+        });
 
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<ITokenService, TokenService>();

@@ -1,4 +1,4 @@
-﻿-- OBD360 Web - SQL Server schema
+-- OBD360 Web - SQL Server schema
 -- Generated from the development database.
 -- Source of truth: EF Core migrations in backend/Obd360.Infrastructure/Migrations.
 
@@ -228,6 +228,50 @@ CREATE TABLE [dbo].[Vehicles] (
     [CreatedAt] datetime2 NOT NULL,
     CONSTRAINT [PK_Vehicles] PRIMARY KEY ([Id])
 );
+GO
+
+-- Indexes (kept identical to backend/Obd360.Infrastructure/Migrations)
+CREATE INDEX [IX_Adapters_UserId] ON [dbo].[Adapters] ([UserId]);
+GO
+CREATE UNIQUE INDEX [IX_Adapters_VehicleId] ON [dbo].[Adapters] ([VehicleId]);
+GO
+CREATE INDEX [IX_AiConversations_UserId] ON [dbo].[AiConversations] ([UserId]);
+GO
+CREATE INDEX [IX_AiMessages_ConversationId_CreatedAt] ON [dbo].[AiMessages] ([ConversationId], [CreatedAt]);
+GO
+CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [dbo].[AspNetRoleClaims] ([RoleId]);
+GO
+CREATE UNIQUE INDEX [RoleNameIndex] ON [dbo].[AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
+GO
+CREATE INDEX [IX_AspNetUserClaims_UserId] ON [dbo].[AspNetUserClaims] ([UserId]);
+GO
+CREATE INDEX [IX_AspNetUserLogins_UserId] ON [dbo].[AspNetUserLogins] ([UserId]);
+GO
+CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [dbo].[AspNetUserRoles] ([RoleId]);
+GO
+CREATE INDEX [EmailIndex] ON [dbo].[AspNetUsers] ([NormalizedEmail]);
+GO
+CREATE UNIQUE INDEX [UserNameIndex] ON [dbo].[AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
+GO
+CREATE INDEX [IX_DtcCatalogEntries_Category] ON [dbo].[DtcCatalogEntries] ([Category]);
+GO
+CREATE INDEX [IX_DtcRecords_SessionId] ON [dbo].[DtcRecords] ([SessionId]);
+GO
+CREATE INDEX [IX_LiveReadings_SessionId_CapturedAt] ON [dbo].[LiveReadings] ([SessionId], [CapturedAt]);
+GO
+CREATE INDEX [IX_MaintenanceReminders_VehicleId_Status] ON [dbo].[MaintenanceReminders] ([VehicleId], [Status]);
+GO
+CREATE INDEX [IX_NotificationLogs_UserId_SentAt] ON [dbo].[NotificationLogs] ([UserId], [SentAt]);
+GO
+CREATE UNIQUE INDEX [IX_RefreshSessions_TokenHash] ON [dbo].[RefreshSessions] ([TokenHash]);
+GO
+CREATE INDEX [IX_RefreshSessions_UserId] ON [dbo].[RefreshSessions] ([UserId]);
+GO
+CREATE INDEX [IX_Reports_VehicleId] ON [dbo].[Reports] ([VehicleId]);
+GO
+CREATE INDEX [IX_ScanSessions_VehicleId_StartedAt] ON [dbo].[ScanSessions] ([VehicleId], [StartedAt]);
+GO
+CREATE INDEX [IX_Vehicles_UserId] ON [dbo].[Vehicles] ([UserId]);
 GO
 
 -- Foreign keys

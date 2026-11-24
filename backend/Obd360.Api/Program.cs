@@ -142,7 +142,15 @@ using (var scope = app.Services.CreateScope())
     // Apply pending migrations and seed the catalog in every environment.
     // The Docker deployment starts with an empty SQL Server volume.
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+
+    if (db.Database.IsRelational())
+    {
+        await db.Database.MigrateAsync();
+    }
+    else
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
 
     var dtcCatalogFile = Path.Combine(app.Environment.ContentRootPath, "Data", "dtc-catalog.json.gz");
     var importedCodes = await DtcCatalogSeeder.SeedAsync(db, dtcCatalogFile);
