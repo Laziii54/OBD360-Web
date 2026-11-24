@@ -25,9 +25,41 @@ OBD360 Web არის ავტომობილის დიაგნოს�
 | Auth | ASP.NET Identity, JWT, refresh token cookie |
 | Automation | n8n 2.47.4, webhook workflows |
 | AI | Google Gemini (`gemini-3.1-flash-lite`) |
-| Tests | xUnit + Vitest, 29 backend + 19 frontend |
+| Tests | xUnit + Vitest, 29 backend + 47 frontend |
 
-C4 მოდელი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) — System Context, Container და Component დიაგრამები.
+### C4 მოდელი
+
+| დონე | დიაგრამა | სად |
+|---|---|---|
+| 1 | System Context — პერსონები და გარე სისტემები | `docs/c4/OBD360 C4.pdf`, გვ. 2 |
+| 2 | Container — SPA, API, ბაზა, n8n | გვ. 3 |
+| 3 | Component — API-ის შიდა კომპონენტები | გვ. 4 |
+
+ფაილი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) (4 გვერდი, PDF-ში ექსპორტირებული).
+C4-ის მიხედვით: Person → Software System → Container → Component → Code; აქ პირველი სამი დონეა,
+მეოთხე (კოდი) წარმოდგენილია ER დიაგრამითა და თავად კოდით.
+
+## შეფასების კრიტერიუმები — სად რა არის
+
+> სადიპლომო პროექტის აღწერაში მოცემული 5 პროექტი მაგალითია; შეფასების კრიტერიუმები საერთოა
+> (Frontend 40 + Backend 40 + დამატებითი 20). ქვემოთ OBD360 ერთი-ერთზეა მიბმული ამ კრიტერიუმებზე.
+
+| # | კრიტერიუმი | ქულა | სად დგას | სტატუსი |
+|---|---|---:|---|---|
+| 1 | რესპონსიული დიზაინი (HTML/CSS) | 10 | `frontend/src/app/**/*.scss` — 33 `@media`, breakpoints 1100–480 px; მობილური მენიუ `main-layout.ts:42` | ✅ |
+| 2 | კომპონენტების სწორი სტრუქტურა (Angular) | 10 | `core/` (services, guards, interceptors, models), `features/` (15 გვერდი), `layout/`; standalone + lazy `loadComponent` | ✅ |
+| 3 | მომხმარებლის ინტერფეისის ფუნქციონალობა | 10 | `app.routes.ts`, ფორმები `login/register/garage/reminders/settings`, CRUD + ვალიდაცია + toast | ✅ |
+| 4 | State management | 10 | Angular Signals — 92 გამოყენება 23 ფაილში; `computed` + `effect`; იხ. ქვემოთ | ✅ |
+| 5 | მონაცემთა ბაზის დიზაინი (SQL) | 10 | `database/schema.sql` (21 ცხრილი, 19 FK, 21 ინდექსი), `seed.sql`, ER დიაგრამა | ✅ |
+| 6 | EF Core მოდელები და მიგრაციები | 10 | `Obd360.Core/Entities/`, `Identity/`, `Migrations/`; ავტომატური `MigrateAsync()` | ✅ |
+| 7 | REST API endpoints (ASP.NET Core) | 10 | `Obd360.Api/Controllers/` — 8 კონტროლერი, 32 endpoint, JSON | ✅ |
+| 8 | ავტორიზაცია / აუტენტიფიკაცია | 10 | Identity + JWT + refresh cookie + როლები + პაროლის აღდგენა | ✅ |
+| 9 | კოდის ხარისხი და დოკუმენტაცია | 10 | README, `docs/`, XML კომენტარები, 29 backend + 47 frontend ტესტი | ✅ (⚠️ ტესტების სიღრმე) |
+| 10 | პრეზენტაცია | 10 | `docs/პრეზენტაცია/*.pptx`, C4, დემო სცენარი `docs/STUDY.md` | ✅ |
+
+**დამატებითი მოთხოვნები (PDF-იდან):** Git ✅ (21 commit, `github.com/Laziii54/OBD360-Web`), Swagger ✅,
+Unit ტესტები ✅ 76, Error handling + logging ✅, README ✅, გაშვების ინსტრუქცია ✅,
+ბაზის სკრიპტები ✅ (`schema.sql`, `seed.sql`), პრეზენტაცია ✅.
 
 ## REST API vs MVC
 
@@ -40,35 +72,91 @@ C4 მოდელი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) — Syst
 | გვერდები სერვერზე გენერირდება | გვერდებს Angular აწყობს |
 | `Views/` საქაღალდე | არ არის `Views/` |
 
-როგორ დავამტკიცოთ:
+როგორ დავამტკიცოთ (დაცვაზე ზედიზედ გახსენი):
 
-1. `Program.cs` — `builder.Services.AddControllers();`
-2. `[ApiController]` ყველა controller-ზე.
-3. `ActionResult<T>` / JSON პასუხები.
-4. Angular `HttpClient` იძახებს `/api/v1/...` მისამართებს.
-5. DevTools → Network → response არის JSON.
+1. `Program.cs:19` — `builder.Services.AddControllers();` — **არა** `AddControllersWithViews()`.
+2. პროექტში **არ არის** `Views/` საქაღალდე და არც ერთი `.cshtml` ფაილი (`glob **/*.cshtml` → 0).
+3. ყველა კონტროლერს აქვს `[ApiController]` + `[Route("api/v1/...")]` და აბრუნებს `ActionResult<T>`/`NoContent()`.
+4. მონაცემები გადის DTO-ებში (`Obd360.Api/Dtos/`) და ბრუნდება JSON-ად; HTML გენერაცია არ ხდება.
+5. UI ცალკე Angular აპლიკაციაა (`frontend/`), რომელიც `HttpClient`-ით იძახებს `/api/v1/...`-ს.
+6. DevTools → Network → `vehicles` request-ის response არის `application/json`, არა `text/html`.
+
+**რა უნდა თქვა:** „MVC აქ მხოლოდ როუტინგისთვის გამოიყენება — Controller/Action. View არ არსებობს:
+სერვერი JSON-ს აბრუნებს, გვერდს Angular აწყობს. ამიტომ ეს არის REST API + SPA, არა server-side MVC.“
 
 ## მონაცემთა ბაზის დიზაინი
 
+**15 ბიზნეს მოდელი → 21 ფიზიკური ცხრილი** = 13 ბიზნეს ცხრილი + 7 ASP.NET Identity +
+`__EFMigrationsHistory` (Identity მხოლოდ მომხმარებლის/როლებისთვისაა, ბიზნეს მონაცემებს არ ეხება).
+
+### მოდელები — სად არის კოდში
+
+| მოდელი | ფაილი |
+|---|---|
+| ApplicationUser, ApplicationRole | `backend/Obd360.Infrastructure/Identity/ApplicationUser.cs` |
+| Vehicle | `backend/Obd360.Core/Entities/Vehicle.cs` |
+| Adapter | `backend/Obd360.Core/Entities/Adapter.cs` |
+| ScanSession, LiveReading, DtcRecord, DtcCatalogEntry | `backend/Obd360.Core/Entities/ScanSession.cs` |
+| MaintenanceReminder | `backend/Obd360.Core/Entities/MaintenanceReminder.cs` |
+| AiConversation, AiMessage | `backend/Obd360.Core/Entities/AiConversation.cs` |
+| Report, NotificationLog | `backend/Obd360.Core/Entities/Report.cs` |
+| UserPreference, RefreshSession | `backend/Obd360.Core/Entities/UserPreference.cs` |
+
+> რამდენიმე კლასი ერთ ფაილშია დაჯგუფებული — `ScanSession.cs` შეიცავს ოთხ კლასს. ამიტომ „15 მოდელი“
+> ითვლება კლასებით და არა ფაილებით.
+
+### სქემა, კავშირები და მთლიანობა
+
 | რესურსი | მდებარეობა |
 |---|---|
-| 15 მოდელი | `backend/Obd360.Core/Entities/`, `Infrastructure/Identity/` |
-| 21 ცხრილი | `database/schema.sql` |
-| EF Core კონფიგურაცია | `backend/Obd360.Infrastructure/Data/ApplicationDbContext.cs` |
+| სრული SQL სქემა — 21 ცხრილი, 19 FK, 21 ინდექსი | `database/schema.sql` |
+| საწყისი მონაცემები (როლები + DTC ნიმუშები) | `database/seed.sql` |
+| EF Core კონფიგურაცია (FK, index, cascade, decimal) | `backend/Obd360.Infrastructure/Data/ApplicationDbContext.cs` |
 | მიგრაციები | `backend/Obd360.Infrastructure/Migrations/` |
-| DTC seeder | `backend/Obd360.Infrastructure/Services/DtcCatalogSeeder.cs` |
-| ვიზუალი | `docs/report/assets/data-model.png` |
+| DTC კატალოგის seeder (13 629 კოდი) | `backend/Obd360.Infrastructure/Services/DtcCatalogSeeder.cs` |
+| ER დიაგრამა (15 მოდელი, PK/FK) | `docs/report/assets/er-diagram.png` |
+| სქემის გენერატორი | `database/generate-schema.ps1` |
 
-> `ScanSession.cs` ერთ ფაილში აერთიანებს `ScanSession`, `LiveReading`, `DtcRecord` და `DtcCatalogEntry` კლასებს.
+დიზაინის გადაწყვეტილებები:
+
+- **1:N** — `ApplicationUser → Vehicles → ScanSessions → {DtcRecords, LiveReadings}`.
+- **1:1** — `UserPreferences` (PK = FK `UserId`), `Adapters` (unique `VehicleId`).
+- **Unique ინდექსები** — `RefreshSessions.TokenHash` (token-ის ჰეში), `Adapters.VehicleId`,
+  `AspNetRoles.NormalizedName`, `AspNetUsers.NormalizedName`.
+- **Cascade delete** — მანქანის წაშლისას იშლება სკანირებები, შეხსენებები და რეპორტები;
+  `Adapters.UserId` არის `Restrict`, რომ მომხმარებლის წაშლამ ადაპტერი არ „ჩამოკიდოს“.
+- **ტიპები** — `uniqueidentifier` PK, `datetime2` დრო, `decimal(10,3)` გაზომვა, `date` ვადა.
+- **DTC კატალოგი** — `DtcCatalogEntries`-ის PK არის `Code` (P0300), `DtcRecords.Code` ტექსტური
+  მითითებაა (FK არ არის), რომ კატალოგის განახლებამ ისტორია არ დააზიანოს.
+
+![ER დიაგრამა](docs/report/assets/er-diagram.png)
+
+### მიგრაციები — როგორ ვაჩვენო
+
+| მიგრაცია | რა აკეთებს |
+|---|---|
+| `20261028152609_InitialCreate` | 21 ცხრილი, 19 FK, 20 ინდექსი |
+| `20261106120000_ExpandDtcCatalog` | `DtcCatalogEntries.Category` ინდექსი + კატალოგის სვეტები |
+
+```powershell
+cd backend/Obd360.Api
+dotnet ef migrations list                 # რა მიგრაციებია და რომელია გამოყენებული
+dotnet ef migrations script -o ..\..\database\migrations.sql   # სუფთა SQL ბაზისთვის
+dotnet ef database update                 # ხელით გამოყენება (ჩვეულებრივ არ გჭირდება)
+```
+
+API გაშვებისას `Program.cs:145` ავტომატურად ახდენს `db.Database.MigrateAsync()`-ს და შემდეგ
+`DtcCatalogSeeder`-ს (Program.cs:148) — ცარიელი ბაზაც თვითონ ივსება.
 
 ## გაშვება
 
 ### მოთხოვნები
 
-- .NET 10 SDK
+- .NET SDK 10 (ან უფრო ახალი; პროექტი `net10.0`-ზეა)
 - Node.js 22+ და npm
 - SQL Server (LocalDB ან სრული ინსტანსი)
 - n8n 2.47.4 (სურვილისამებრ, AI ფუნქციისთვის)
+- `dotnet-ef` tool (მხოლოდ მიგრაციების ხელით სამართავად): `dotnet tool install -g dotnet-ef`
 
 ### 1. მონაცემთა ბაზა
 
@@ -76,22 +164,29 @@ C4 მოდელი: [docs/c4/OBD360 C4.pdf](<docs/c4/OBD360 C4.pdf>) — Syst
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=GeorgianCarScannerWeb;Trusted_Connection=True;TrustServerCertificate=True"
+  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=GeorgianCarScannerWeb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
 }
 ```
 
+> Development-შიც და Docker-შიც ბაზის სახელია `GeorgianCarScannerWeb`.
+
 API გაშვებისას ავტომატურად უშვებს EF Core მიგრაციებს და DTC კატალოგის seeder-ს.
 
-სუფთა ბაზისთვის შეგიძლია გამოიყენო:
+სუფთა ბაზისთვის შეგიძლია გამოიყენო (ჯერ ბაზა უნდა არსებობდეს):
 
 ```powershell
-sqlcmd -S localhost -E -d GeorgianCarScannerWeb -i database/schema.sql
-sqlcmd -S localhost -E -d GeorgianCarScannerWeb -i database/seed.sql
+sqlcmd -S "(localdb)\MSSQLLocalDB" -E -Q "CREATE DATABASE Obd360WebDevDb"
+sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d GeorgianCarScannerWeb -i database/schema.sql
+sqlcmd -S "(localdb)\MSSQLLocalDB" -E -d GeorgianCarScannerWeb -i database/seed.sql
 ```
+
+> `schema.sql` მიგრაციების იდენტურია (ცხრილები + ინდექსები + FK). თუ მიგრაციები შეიცვალა,
+> ხელახლა გენერაცია: `database/generate-schema.ps1` ან `dotnet ef migrations script`.
 
 ### 2. Backend
 
 ```powershell
+sqllocaldb start MSSQLLocalDB
 cd backend/Obd360.Api
 dotnet run
 ```
@@ -146,6 +241,29 @@ $env:OBD360_TELEGRAM_CHAT_ID = "123456789"
 
 Bot token: `@BotFather` → `/newbot`. Chat ID: `@userinfobot` ან `getUpdates`.
 თუ env ცვლადები არ არის დაყენებული, workflow იღებს მოთხოვნას, მაგრამ Telegram-ში არ აგზავნის.
+
+## ავტორიზაცია — JWT, refresh token, როლები
+
+| რას აჩვენებ | სად |
+|---|---|
+| Identity კონფიგურაცია (პაროლის პოლიტიკა, unique email) | `Program.cs:76` |
+| JWT ვალიდაცია (issuer, audience, signing key, lifetime) | `Program.cs:88` |
+| JWT-ის შექმნა (sub, email, jti, role claims, HS256) | `Infrastructure/Services/TokenService.cs:20` |
+| Access token-ის ვადა / refresh-ის ვადა | `appsettings.json` — `Jwt:AccessTokenMinutes` (15), `Jwt:RefreshTokenDays` (30) |
+| რეგისტრაცია / login | `AuthController.cs:53`, `:94` |
+| Token-ების გაცემა + HttpOnly refresh cookie | `AuthController.cs:283`, cookie `:300` |
+| Refresh rotation (ძველი უქმდება) | `AuthController.cs:110`, `:133` |
+| Logout | `AuthController.cs:138` |
+| როლები: `User` / `Admin` | `Program.cs:155`; `[Authorize(Roles = "Admin")]` `AdminController.cs:13` |
+| Frontend: token მეხსიერებაში (sessionStorage) | `core/services/auth.ts:29`, `:116` |
+| Frontend: `Authorization: Bearer` header | `core/interceptors/auth-interceptor.ts:8`, `:22` |
+| Frontend: 401-ზე ავტომატური refresh | `core/interceptors/auth-interceptor.ts:28` |
+| Route guard (ავტორიზაცია / Admin) | `core/guards/auth-guard.ts:6`, `admin-guard.ts:5` |
+
+როგორ ვაჩვენო დაცვაზე: login → DevTools → Application → Cookies → `refreshToken` (HttpOnly, Secure,
+SameSite=Strict); Network → request header `Authorization: Bearer eyJ...`; jwt.io-ში token-ის payload
+აჩვენებს `sub`, `email`, `role`, `exp`. შემდეგ — 401 სცენარი: token-ის წაშლა → გვერდის განახლება →
+interceptor აკეთებს refresh-ს.
 
 ## პაროლის აღდგენა
 
@@ -224,12 +342,113 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 - `POST /users/{id}/toggle-role` — Admin როლის დამატება/მოხსნა
 - `GET /scans?search=` — ყველა მომხმარებლის ბოლო სკანირებები
 
-## ლოგირება და Swagger
+## Swagger — API დოკუმენტაცია
 
-- HTTP request logging: method, path, status, duration.
-- Auth ლოგები: register, login success/failure, password reset/change.
-- Reminder email ლოგები: გაგზავნა/შეცდომა.
-- Swagger: `http://localhost:5269/swagger` — API info, JWT Authorize, XML summaries (Admin/Auth).
+| რას აჩვენებ | სად |
+|---|---|
+| Swagger UI (ინტერაქტიული) | `http://localhost:5269/swagger` |
+| OpenAPI JSON | `http://localhost:5269/swagger/v1/swagger.json` |
+| ალტერნატიული OpenAPI | `http://localhost:5269/openapi/v1.json` |
+| სკრინშოტი | `docs/report/assets/swagger.png` |
+| კონფიგურაცია | `Program.cs:30` — `AddSwaggerGen`, JWT „Authorize“ ღილაკი `Program.cs:46` |
+
+დემო Swagger-ში (ეს არის „ენდპოინტები მუშაობს“-ის მტკიცებულება):
+
+1. `POST /api/v1/auth/register` → 200 + `accessToken` (ან `login`, თუ უკვე გაქვს).
+2. **Authorize** → ჩასვი token **Bearer-ის გარეშე** → Authorize.
+3. `GET /api/v1/vehicles` → **200**; token-ის გარეშე → **401**.
+4. `POST /api/v1/vehicles` არასწორი VIN-ით → **400** `ValidationProblemDetails`.
+5. `GET /api/v1/vehicles/{არარსებული guid}` → **404**.
+6. `GET /api/v1/admin/overview` User როლით → **403**, Admin-ით → **200**.
+
+> XML კომენტარები (`/// <summary>`) ამჟამად Auth/Ai/Admin კონტროლერებზეა; დანარჩენებზე endpoint-ები
+> მაინც სრულად ჩანს (სქემებითა და ტიპებით), უბრალოდ აღწერის ტექსტის გარეშე.
+
+## Error handling
+
+| სიტუაცია | რა ბრუნდება | სად |
+|---|---|---|
+| ვალიდაცია | `400` + `ValidationProblemDetails` (ველების შეცდომები) | DTO ატრიბუტები `Obd360.Api/Dtos/*.cs` (26 ატრიბუტი) |
+| არაავტორიზებული | `401` | `[Authorize]` ყველა კონტროლერზე, გარდა Auth-ის login/register |
+| აკრძალული | `403` | `AdminController.cs:13` — `[Authorize(Roles = "Admin")]` |
+| ვერ მოიძებნა | `404` | მაგ. `VehiclesController.cs:58`, `RemindersController.cs:80` |
+| კონფლიქტი | `409` | `AuthController.cs:59` (დუბლირებული email), `VehiclesController.cs:72` (VIN) |
+| დაუმუშავებელი შეცდომა | `500` + ქართული JSON + ლოგი | `Program.cs:120` — `UseExceptionHandler` |
+| Frontend 401 | ავტომატური refresh → თუ ვერა, `/login` | `auth-interceptor.ts:22` |
+
+## Logging
+
+| რა ილოგება | სად |
+|---|---|
+| HTTP: method, path, status, duration | `Program.cs:21` (`AddHttpLogging`) + `Program.cs:170` (`UseHttpLogging`) |
+| რეგისტრაცია / login / წარუმატებელი login | `AuthController.cs:88, 100, 104` |
+| პაროლის აღდგენა/შეცვლა | `AuthController.cs:166, 227, 257` |
+| რემაინდერის მეილები (წარმატება/შეცდომა) | `ReminderNotificationService.cs` |
+| SMTP შეცდომა | `AuthController.cs:191` (`LogError`) |
+| დაუმუშავებელი exception | `Program.cs:125` |
+
+ლოგები ჩანს API-ის კონსოლში (Development):
+
+```text
+info: Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware[1]
+      Request: GET /api/v1/vehicles
+info: Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware[2]
+      Response: StatusCode: 200, Duration: 42.7ms
+```
+
+## State management — Angular Signals
+
+**რა არის:** state management პასუხობს კითხვას — სად ინახება ეკრანის მონაცემები და როგორ ახლდება
+ინტერფეისი მათ ცვლილებაზე. NgRx არ გამოიყენება; გამოყენებულია Angular-ის **Signals** (fine-grained
+reactivity): `signal` ინახავს მნიშვნელობას, `computed` ითვლის წარმოებულს, `effect` ასრულებს გვერდით
+ეფექტს. ცვლილებისას Angular თავად ახდენს მხოლოდ დამოკიდებული view-ის განახლებას.
+
+| რას მართავს | ფაილი |
+|---|---|
+| ავტორიზაცია: token + user + `isAuthenticated` | `core/services/auth.ts:29` |
+| პარამეტრები: ერთეულები, refresh ინტერვალი (localStorage-ით) | `core/services/user-settings.service.ts:31` + `effect` :36 |
+| ადმინი: ტაბები, ძებნა, `filteredUsers`, `filteredScans` | `features/admin/admin.ts:22–58` |
+| გვერდითი მენიუ (მობილური) | `layout/main-layout/main-layout.ts:42` + `effect` :45 |
+| Garage / Reminders / Scan History / DTC Catalog | შესაბამისი `features/*.ts` |
+
+მაგალითი — `admin.ts`:
+
+```ts
+readonly userSearch = signal('');
+readonly filteredUsers = computed(() => {
+  const term = this.userSearch().trim().toLowerCase();
+  return this.users().filter((user) => user.email.toLowerCase().includes(term));
+});
+```
+
+**რა უნდა თქვა:** „`signal` არის რეაქტიული ცვლადი. `computed` მასზე დამოკიდებული გამოთვლაა —
+`userSearch`-ის შეცვლისას სია ავტომატურად გადაითვლება და ეკრანი განახლდება; `effect` ინახავს
+პარამეტრს localStorage-ში. ეს არის state management components-ის დონეზე, service-ებით.“
+
+სულ: **92** `signal/computed/effect` გამოყენება **23** ფაილში.
+
+## მომხმარებლის ინტერფეისი და რესპონსიულობა
+
+| გვერდი | URL | ფუნქციონალი |
+|---|---|---|
+| Login / Register | `/login`, `/register` | ავტორიზაცია, ვალიდაცია, შეცდომები |
+| Forgot password | `/forgot-password` | 6-ნიშნა კოდი, ახალი პაროლი |
+| Dashboard | `/app/dashboard` | ბარათები, live data, ბოლო სკანირება |
+| Garage | `/app/garage` | მანქანების CRUD, VIN ვალიდაცია |
+| Reminders | `/app/reminders` | შეხსენებები, ვადაგასული, დასრულება |
+| Bluetooth | `/app/bluetooth` | Web Bluetooth, ადაპტერთან დაკავშირება |
+| Live Data | `/app/live-data` | PID-ების რეალურ დროში კითხვა |
+| DTC Scanner | `/app/dtc-scanner` | 03/07/0A, გასუფთავება |
+| ECU Modules / Freeze Frame / Graphs | `/app/ecu-modules`, `/app/freeze-frame`, `/app/graphs` | მოდულები, მონიშვნა, გრაფიკები |
+| Scan History | `/app/scan-history` | ისტორია, დეტალები |
+| AI Assistant | `/app/ai-assistant` | n8n/Gemini დიაგნოსტიკა |
+| Settings | `/app/settings` | ერთეულები, პაროლი, თემა |
+| Admin | `/app/admin` | users/roles/scans (მხოლოდ Admin) |
+
+რესპონსიულობა: 33 `@media` წესი (breakpoints 1100/1000/950/900/720/700/650/640/520/480 px +
+`prefers-reduced-motion`); 720 px-ზე გვერდითი მენიუ იმალება და იხსნება burger-ით
+(`main-layout.ts:42`, `HostListener` :65). ცხრილები მობილურზე ბარათებად იშლება
+(`dashboard.scss`, `garage.scss`, `reminders.scss`).
 
 ## API
 
@@ -263,51 +482,86 @@ SMTP-ის გარეშე (Development) API კოდს ლოგში �
 
 ## პრეზენტაცია
 
-- `docs/slides/OBD360-Web-Presentation.pptx` — 18 სლაიდი (სრული ვერსია)
-- `docs/slides/OBD360-Web-Presentation.pdf` — PDF ვერსია
-- სლაიდებში: OBD-II/ECU დიაგრამა, DTC კატალოგი (13,629), კოდის ნაკადი, არქიტექტურა და დემო.
-
-### გამარტივებული ვერსია — OBD2
-
-- `docs/slides/OBD2-Web-Presentation-Simple.pptx` — 13 სლაიდი
-- `docs/slides/OBD2-Web-Presentation-Simple.pdf` — PDF ვერსია
-- ყველა წარწერა **OBD2**-ია; ტექსტი შემცირებულია და გამარტივებულია.
+- `docs/პრეზენტაცია/პრეზენტაცია.pptx` — **16 სლაიდი** (მიმდინარე ვერსია)
+- სლაიდებში: OBD-II/ECU დიაგრამა, **რეალური ადაპტერისა და მანქანის 16-pin პორტის ფოტოები** (სლაიდი 4), DTC კატალოგი (13,629), არქიტექტურა, უსაფრთხოება, AI, დემო და ტესტები.
 
 ## დოკუმენტაცია
 
-- `docs/report/OBD360-Web-Documentation.docx` — სრული პროექტის დოკუმენტაცია (36 გვერდი)
-- `docs/report/OBD360-Web-Documentation.pdf` — PDF ვერსია
-- მოიცავს: OBD-II თეორია, არქიტექტურა, მონაცემთა მოდელი, API, OBD-II კოდი, უსაფრთხოება, ტესტირება, გაშვება და მომხმარებლის გზამკვლევი.
+| დოკუმენტი | რა არის |
+|---|---|
+| `README.md` (ეს ფაილი) | სრული ტექნიკური დოკუმენტაცია + გაშვება + კრიტერიუმები |
+| `docs/report/OBD360-Web-Documentation.docx/.pdf` | 36-გვერდიანი აკადემიური დოკუმენტაცია |
+| `docs/STUDY.md` | სწავლის ფურცელი: კოდის რუკა, დემო, 10 კითხვა-პასუხი |
+| `docs/c4/OBD360 C4.pdf` | C4: Context, Container, Component |
+| `docs/report/assets/er-diagram.png` | ER დიაგრამა (15 მოდელი, PK/FK) |
 
-## სწავლისა და დაცვის გზამკვლევი
+აკადემიური დოკუმენტაცია მოიცავს: OBD-II თეორია, არქიტექტურა, მონაცემთა მოდელი, API, OBD-II კოდი,
+უსაფრთხოება, ტესტირება, გაშვება და მომხმარებლის გზამკვლევი.
 
-- `docs/CODE-GUIDE.md` — კოდის რუკა: სად არის რა, 30 კითხვა-პასუხი, 5 სცენარი.
-- `docs/report/OBD360-Defense-Guide.docx` / `.pdf` — 9-გვერდიანი დაცვის შეკვრა მარტივი ქართული ენით.
+## სწავლის ფურცელი
+
+`docs/STUDY.md` — ერთი გვერდი: სად არის რა, დემო 6 ნაბიჯად, 10 კითხვა-პასუხი და რიცხვები, რომლებიც უნდა ახსოვდეს.
 
 ## ტესტები
 
+### Backend — xUnit (29 ტესტი)
+
 ```powershell
 cd backend
-dotnet test
+dotnet test                                   # ყველა
+dotnet test --filter "FullyQualifiedName~VehiclesAndReminders"
+dotnet test --collect:"XPlat Code Coverage"   # coverage (coverlet)
 ```
 
-მიმდინარე შედეგი: **29/29 backend** და **19/19 frontend** ტესტი passed.
+| ფაილი | რას ამოწმებს |
+|---|---|
+| `Obd360.Tests/Controllers/VehiclesAndRemindersTests.cs` | მანქანის CRUD, მომხმარებლის იზოლაცია, VIN დუბლიკატი, შეხსენების სრული ციკლი, სხვისი მანქანის აკრძალვა |
+| `Obd360.Tests/N8n/N8nClientTests.cs` | webhook-ის გამოძახება, retry 5xx-ზე, client error-ზე retry-ის არარსებობა, timeout, health probe |
+| `Obd360.Tests/N8n/N8nResponseParserTests.cs` | OpenAI/Anthropic/ტექსტური პასუხის პარსინგი, ცარიელი პასუხი |
+| `Obd360.Tests/N8n/ScanPromptBuilderTests.cs` | ქართული prompt-ის აწყობა, კოდების/მიზეზების ჩასმა, ისტორია |
+
+### Frontend — Vitest (47 ტესტი)
+
+```powershell
+cd frontend
+npm test -- --watch=false
+```
+
+| ფაილი | რას ამოწმებს |
+|---|---|
+| `src/app/core/services/obd-decoder.spec.ts` | **28 ტესტი** — PID-ის ბაიტების პარსინგი, RPM/სიჩქარე/ტემპერატურა/ძაბვა, DTC-ის დეკოდირება (P/C/B/U), CAN და non-CAN პასუხები, multi-frame, VIN, ECU მისამართები, freeze frame, მზადყოფნის მონიტორები, ერთეულების კონვერტაცია |
+| 18 `*.spec.ts` (კომპონენტები, `auth`, guards, interceptor) | **19 smoke ტესტი** — კომპონენტის/სერვისის შექმნა |
+
+### შედეგი
+
+```text
+Passed! - Failed: 0, Passed: 29, Skipped: 0, Total: 29      (2026-11-21)
+Test Files 18 passed (18) / Tests 19 passed (19)            (2026-11-21)
+```
+
+> `obd-decoder.spec.ts` დაემატა 2026-11-24-ს; მისი 28 ტესტი უნდა გაეშვას `npm test`-ით.
+> ლოგიკა დამოწმებულია Node-ზე იმავე ფუნქციების გაშვებით (28/28 ემთხვევა), თუმცა Vitest-ის
+> გაშვება ამ გარემოში ვერ მოხერხდა (sandbox ბლოკავს პროცესის spawn-ს).
+
+დეტალები: `README.md` → ეს სექცია.
 
 ## პროექტის სტრუქტურა
 
 ```
 backend/
-  Obd360.Api/            Web API, controllers, n8n integration
+  Obd360.Api/            Web API, controllers, DTOs, n8n integration
   Obd360.Core/           entities, enums
-  Obd360.Infrastructure/ EF Core DbContext, migrations, seeding
+  Obd360.Infrastructure/ EF Core DbContext, migrations, seeding, Identity
   Obd360.Tests/          xUnit tests
 frontend/
-  src/app/core/          services, guards, interceptors
-  src/app/features/      dashboard, garage, reminders, bluetooth, ...
+  src/app/core/          services, guards, interceptors, models
+  src/app/features/      15 feature pages (dashboard, garage, ...)
   src/app/layout/        sidebar, topbar
+database/                schema.sql, seed.sql, generate-schema.ps1, DtcCatalog
 n8n/                     n8n workflows and start/stop scripts
-database/                schema.sql, seed.sql
 docs/c4/                 C4 diagrams (PDF)
+docs/report/             full documentation, ERD, assets (docx/pdf)
+docs/პრეზენტაცია/        presentation (pptx)
 ```
 
 ## Docker
@@ -328,7 +582,7 @@ Docker გარემოში connection string, JWT, CORS და Telegram ც
 
 ### DigitalOcean (production)
 
-Droplet-ზე გაშვების ინსტრუქცია: [`docs/deployment/DIGITALOCEAN.md`](docs/deployment/DIGITALOCEAN.md).
+Production კონფიგურაცია მზადაა, მაგრამ Droplet-ზე ჯერ არ გაშვებულა.
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -343,7 +597,29 @@ Production override მალავს SQL Server/API/n8n პორტებს 
 - GitHub Actions CI/CD — ჯერ არ არის.
 - სრული ინტეგრაციული ტესტები რეალურ SQL Server-ზე.
 - DigitalOcean-ის რეალური deployment ჯერ არ გაშვებულა; საჭიროა Droplet/დომენი.
+- Frontend ტესტები: 19 smoke + 28 `obd-decoder` ტესტი; დარჩენილია ინტერცეპტორისა და guard-ების
+  ქცევითი ტესტები.
+- Login-ზე არ არის lockout/rate limiting (Identity-ის `Lockout` არ არის ჩართული).
+- Swagger ჩართულია ყველა გარემოში (`Program.cs:164`); Production-ში ღირს დაფარვა ან ავტორიზაცია.
+
+## დემო სცენარი (20 წუთი)
+
+| # | რას აჩვენებ | სად |
+|---|---|---|
+| 1 | README + გაშვების ინსტრუქცია | `README.md` |
+| 2 | Swagger + JWT Authorize | `http://localhost:5269/swagger` |
+| 3 | ბაზა: 21 ცხრილი, FK, ინდექსები, ERD | `database/schema.sql`, `docs/report/assets/er-diagram.png` |
+| 4 | მიგრაციები + ავტომატური გაშვება | `Migrations/`, `Program.cs:145` |
+| 5 | Login/JWT/refresh/პაროლის აღდგენა | `AuthController.cs`, `TokenService.cs` |
+| 6 | UI: dashboard, garage, reminders, admin, მობილური მენიუ | `http://localhost:4200` |
+| 7 | Signals (state) | `admin.ts:32`, `user-settings.service.ts:36` |
+| 8 | ტესტები | `dotnet test`, `npm test` |
+| 9 | error handling + logging | `Program.cs:120`, API კონსოლი |
+| 10 | C4 + პრეზენტაცია | `docs/c4/`, `docs/პრეზენტაცია/` |
+
+დეტალები: [`docs/STUDY.md`](docs/STUDY.md).
 
 ## ავტორი
 
 ზურაბ ლაზაშვილი — OBD360 Web, 2026.
+
