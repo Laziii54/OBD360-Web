@@ -63,7 +63,7 @@
           "options": {
             "prebundle": false,
             "proxyConfig": "proxy.conf.json",
-            "allowedHosts": ["specially-prev-flame-versus.trycloudflare.com"]
+            "allowedHosts": [".trycloudflare.com"]
           },
           "configurations": {
             "production": {
